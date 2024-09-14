@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart';
 import 'package:logger/logger.dart';
+import 'package:vool_test_project/BookmarkedCountriesScreen.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
 import 'package:vool_test_project/widgets/CountryItemWidget.dart';
 
@@ -103,7 +104,11 @@ class _CountriesScreenState extends State<CountriesScreen> {
                   CountryModel country = countries[index];
                   return GestureDetector(
                     onTap: () {
-                      Logger().e("ON TAP");
+                      Logger().e("ON TAP: country: "+country.capital.toString());
+                      Logger().e("ON TAP: index: "+index.toString());
+                      showDialog(context: context, builder: (BuildContext context){
+                        return BookmarkedCountriesScreen(model: country);
+                      });
                     },
                     child: Container(
                       padding: EdgeInsets.all(10.0),
