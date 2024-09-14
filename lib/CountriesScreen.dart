@@ -23,7 +23,6 @@ class CountriesScreen extends StatefulWidget {
 }
 
 class _CountriesScreenState extends State<CountriesScreen> {
-
   //late Future<List<CountryDataModel>> futureCountryData;
 
   // final response = await Request.Post('https://restcountries.com/v3.1/all?fields=name,flag,flags,capital,car,languages', {
@@ -42,8 +41,6 @@ class _CountriesScreenState extends State<CountriesScreen> {
   //   'geo': {'x': longitude, 'y': latitude },
   // });
 
-
-
   // if (response != null) {
   // final data = response;
   //
@@ -52,23 +49,18 @@ class _CountriesScreenState extends State<CountriesScreen> {
   // Navigator.pop(context);
   // }
 
-
-
-
-
-  final items = List<CountryListItem>.generate(
-    10,
-        (i) => CountryListItem("Estonia", 1, "Tallinn", 10000, "EST", "left")
-  );
+  final items = List<CountryListItem>.generate(10,
+      (i) => CountryListItem("Estonia", 1, "Tallinn", 10000, "EST", "left"));
 
   @override
-  void initState()  {
+  void initState() {
     futureCountries = fetchCountriesData();
     //futureCountryData = fetchCountries();
   }
 
   Future<http.Response> requestCountriesData() async {
-    final response = await http.get(Uri.parse('https://restcountries.com/v3.1/all?fields=name,flag,flags,capital,car,languages'));
+    final response = await http.get(Uri.parse(
+        'https://restcountries.com/v3.1/all?fields=name,flag,flags,capital,car,languages'));
     Logger logger = new Logger();
     var jsonData = jsonDecode(response.body);
 
@@ -79,7 +71,8 @@ class _CountriesScreenState extends State<CountriesScreen> {
   }
 
   Future<List<CountryModel>> fetchCountriesData() async {
-    final response = await http.get(Uri.parse('https://restcountries.com/v3.1/all?fields=name,flag,flags,capital,car,languages'));
+    final response = await http.get(Uri.parse(
+        'https://restcountries.com/v3.1/all?fields=name,flag,flags,capital,car,languages'));
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
@@ -108,10 +101,25 @@ class _CountriesScreenState extends State<CountriesScreen> {
                 itemCount: countries.length,
                 itemBuilder: (context, index) {
                   CountryModel country = countries[index];
-                  return ListTile(
-                    title: Text(country.capital ?? 'Unknown Capital'),
-                    subtitle: Text('Flag PNG: ${country.pngFlag ?? 'N/A'}'),
-                  );
+                  // return ListTile(
+                  //   title: Text(country.capital ?? 'Unknown Capital'),
+                  //   subtitle: Text('Flag PNG: ${country.pngFlag ?? 'N/A'}'),
+                  // );
+                  return Container(
+                      padding: EdgeInsets.all(10.0),
+                      margin: EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black54)
+                      ),
+                      height: 60.0,
+                      child: Row(children: [
+                        Image.network(
+                            width: 20.0,
+                            height: 20.0,
+                            country.pngFlag ?? 'N/A'),
+                        SizedBox(width: 10.0),
+                        Text(country.capital ?? 'Unknown Capital'),
+                      ]));
                 },
               );
             } else if (snapshot.hasError) {
@@ -126,71 +134,71 @@ class _CountriesScreenState extends State<CountriesScreen> {
   }
 }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-  //       title: Text(widget.title),
-  //     ),
-  //     // body: ListView.builder(
-  //     //   // Let the ListView know how many items it needs to build.
-  //     //   itemCount: items.length,
-  //     //   // Provide a builder function. This is where the magic happens.
-  //     //   // Convert each item into a widget based on the type of item it is.
-  //     //   itemBuilder: (context, index) {
-  //     //
-  //     //
-  //     //     final item = items[index];
-  //     //
-  //     //     return CountryItemWidget(
-  //     //       capitalName: item.capitalName,
-  //     //       image: item.flag,
-  //     //     );
-  //     //   },
-  //     // ),
-  //     body: Center(
-  //       child: FutureBuilder<List<CountryDataModel>>(
-  //         future: futureCountryData,  // Now it's a Future<List<CountryDataModel>>
-  //         builder: (context, snapshot) {
-  //           if (snapshot.hasData) {
-  //             Logger().e("Data loaded");
-  //
-  //             // Example: Displaying the first country’s capital
-  //             return ListView.builder(
-  //               itemCount: snapshot.data?.length,
-  //               itemBuilder: (context, index) {
-  //                 final country = snapshot.data?[index];
-  //                 return ListTile(
-  //                   title: Text(snapshot.data?.first.nativeCommonName ?? 'Unknown'),
-  //                   subtitle: Text('Capital: ${country?.capital?.first.toString() ?? 'N/A'}'),
-  //                 );
-  //               },
-  //             );
-  //           } else if (snapshot.hasError) {
-  //             Logger().e("Data errror");
-  //             return Text('${snapshot.error}');
-  //           }
-  //           return const CircularProgressIndicator();
-  //         },
-  //       ),
-  //     ),
-  //
-  //     //body: Container(
-  //     //  child:
-  //       // child: Column(
-  //       //   mainAxisAlignment: MainAxisAlignment.center,
-  //       //   children: <Widget>[
-  //       //
-  //       //
-  //       //
-  //       //   ],
-  //       // ),
-  //     //),
-  //     // floatingActionButton: FloatingActionButton(
-  //     //   onPressed: (),
-  //     //   tooltip: 'Increment',
-  //     //   child: const Icon(Icons.add),
-  //     // ),
-  //   );
-  // }
+// @override
+// Widget build(BuildContext context) {
+//   return Scaffold(
+//     appBar: AppBar(
+//       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+//       title: Text(widget.title),
+//     ),
+//     // body: ListView.builder(
+//     //   // Let the ListView know how many items it needs to build.
+//     //   itemCount: items.length,
+//     //   // Provide a builder function. This is where the magic happens.
+//     //   // Convert each item into a widget based on the type of item it is.
+//     //   itemBuilder: (context, index) {
+//     //
+//     //
+//     //     final item = items[index];
+//     //
+//     //     return CountryItemWidget(
+//     //       capitalName: item.capitalName,
+//     //       image: item.flag,
+//     //     );
+//     //   },
+//     // ),
+//     body: Center(
+//       child: FutureBuilder<List<CountryDataModel>>(
+//         future: futureCountryData,  // Now it's a Future<List<CountryDataModel>>
+//         builder: (context, snapshot) {
+//           if (snapshot.hasData) {
+//             Logger().e("Data loaded");
+//
+//             // Example: Displaying the first country’s capital
+//             return ListView.builder(
+//               itemCount: snapshot.data?.length,
+//               itemBuilder: (context, index) {
+//                 final country = snapshot.data?[index];
+//                 return ListTile(
+//                   title: Text(snapshot.data?.first.nativeCommonName ?? 'Unknown'),
+//                   subtitle: Text('Capital: ${country?.capital?.first.toString() ?? 'N/A'}'),
+//                 );
+//               },
+//             );
+//           } else if (snapshot.hasError) {
+//             Logger().e("Data errror");
+//             return Text('${snapshot.error}');
+//           }
+//           return const CircularProgressIndicator();
+//         },
+//       ),
+//     ),
+//
+//     //body: Container(
+//     //  child:
+//       // child: Column(
+//       //   mainAxisAlignment: MainAxisAlignment.center,
+//       //   children: <Widget>[
+//       //
+//       //
+//       //
+//       //   ],
+//       // ),
+//     //),
+//     // floatingActionButton: FloatingActionButton(
+//     //   onPressed: (),
+//     //   tooltip: 'Increment',
+//     //   child: const Icon(Icons.add),
+//     // ),
+//   );
+// }
