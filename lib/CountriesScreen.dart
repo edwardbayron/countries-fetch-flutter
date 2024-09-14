@@ -101,16 +101,15 @@ class _CountriesScreenState extends State<CountriesScreen> {
                 itemCount: countries.length,
                 itemBuilder: (context, index) {
                   CountryModel country = countries[index];
-                  // return ListTile(
-                  //   title: Text(country.capital ?? 'Unknown Capital'),
-                  //   subtitle: Text('Flag PNG: ${country.pngFlag ?? 'N/A'}'),
-                  // );
-                  return Container(
+                  return GestureDetector(
+                    onTap: () {
+                      Logger().e("ON TAP");
+                    },
+                    child: Container(
                       padding: EdgeInsets.all(10.0),
                       margin: EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black54)
-                      ),
+                          border: Border.all(color: Colors.black54)),
                       height: 60.0,
                       child: Row(children: [
                         Image.network(
@@ -119,7 +118,9 @@ class _CountriesScreenState extends State<CountriesScreen> {
                             country.pngFlag ?? 'N/A'),
                         SizedBox(width: 10.0),
                         Text(country.capital ?? 'Unknown Capital'),
-                      ]));
+                      ]),
+                    ),
+                  );
                 },
               );
             } else if (snapshot.hasError) {

@@ -46,6 +46,7 @@
 // }
 
 class CountryModel {
+
   final String? capital;
   final String? pngFlag;
 
