@@ -1,111 +1,95 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vool_test_project/CountryDetailsScreen.dart';
+import 'package:vool_test_project/models/CountryDataModel.dart';
 
-import 'models/CountryDataModel.dart';
 
-/// Flutter code sample for [AlertDialog].
+import 'package:http/http.dart' as http;
 
-void main() => runApp(
-    BookmarkedCountriesScreen(model: CountryModel(capital: '', pngFlag: '')));
+class BookmarkedCountriesScreen extends StatefulWidget {
+  const BookmarkedCountriesScreen({super.key});
 
-class BookmarkedCountriesScreen extends StatelessWidget {
-  final CountryModel model;
 
-  const BookmarkedCountriesScreen({super.key, required this.model});
+  @override
+  State<BookmarkedCountriesScreen> createState() => _CountriesScreenState();
+}
+
+class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
+
+  Set<String> bookmarkedCountries = Set();
+  List<CountryModel> allCountries = []; // To store all countries initially
+  List<CountryModel> bookmarkedCountriesList = [];
+
+
+  @override
+  void initState() {
+    loadBookmarks();
+  }
+
+  Future<void> loadBookmarks() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? savedBookmarks = prefs.getStringList('bookmarkedCountries');
+    if (savedBookmarks != null) {
+      setState(() {
+        bookmarkedCountries = savedBookmarks.toSet();
+        bookmarkedCountriesList = allCountries
+            .where((country) => bookmarkedCountries.contains(country.capital))
+            .toList();
+        Logger().e("test: "+bookmarkedCountriesList.length.toString());
+      });
+    }
+  }
+
+
+  late Future<List<CountryModel>> futureCountries;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Country details')),
-        body: Center(
-          child: DialogExample(model: model),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Bookmarks"),
+      ),
+      body: ListView.builder(
+        itemBuilder: (context, index) {
+          CountryModel country = bookmarkedCountriesList[index];
+
+          return GestureDetector(
+            onTap: () {
+              showDialog(context: context, builder: (BuildContext context) {
+                return CountryDetailsScreen(model: country);
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.all(10.0),
+              margin: EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black54)),
+              height: 60.0,
+              child: Row(
+                children: [
+                  Image.network(
+                    width: 20.0,
+                    height: 20.0,
+                    country.pngFlag ?? 'N/A',
+                  ),
+                  SizedBox(width: 10.0),
+                  Text(country.capital ?? 'Unknown Capital'),
+                  Expanded(child: SizedBox()),
+                  Image.asset(
+                    width: 20.0,
+                    height: 20.0,
+                    'assets/images/bookmark_filled.png', // Display filled bookmark
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 }
 
-class DialogExample extends StatelessWidget {
-  final CountryModel model;
-
-  const DialogExample({super.key, required this.model});
-
-  @override
-  Widget build(BuildContext context) {
-    // return TextButton(
-    //   onPressed: () => showDialog<String>(
-    //     context: context,
-    //     builder: (BuildContext context) => AlertDialog(
-    //       title: Text('Capital: ${model.capital}'),
-    //       content: const Text('AlertDialog description'),
-    //       actions: <Widget>[
-    //         TextButton(
-    //           onPressed: () => Navigator.pop(context, 'Cancel'),
-    //           child: const Text('Cancel'),
-    //         ),
-    //         TextButton(
-    //           onPressed: () => Navigator.pop(context, 'OK'),
-    //           child: const Text('OK'),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    //   child: const Text('Show Dialog'),
-    // );
-
-    return Material(
-        child: Container(
-          width: 400,
-            padding: const EdgeInsets.fromLTRB(40.0, 70.0, 40.0, 50.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-            ),
-            child: Column(
-              children: [
-
-                Row(
-                  children: [
-                    Text('Country name'),
-                    SizedBox(width: 10.0),
-                    Text('${model.capital}'),
-                    SizedBox(width: 10.0),
-                    Image.network(
-                        width: 20.0,
-                        height: 20.0,
-                        model.pngFlag ?? 'N/A'),
-
-                  ],
-                ),
-                SizedBox(height: 10.0),
-                Row(
-                  children: [
-                    Text('Population'),
-                  ],
-                ),
-                SizedBox(height: 10.0),
-                Row(
-                  children: [
-                    Text('Car sign'),
-                    SizedBox(width: 10.0),
-                    Text('Card driving side')
-                  ],
-                ),
-                SizedBox(height: 10.0),
-                // ListView.builder(
-                // itemCount: 2,
-                // itemBuilder: (context, index) {
-                //   Row(children: [
-                //     Text('Finnish'),
-                //     SizedBox(width: 10.0),
-                //     Text('Suomi')
-                //   ],);
-                // }),
-
-
-
-
-
-              ],
-            )));
-  }
-}

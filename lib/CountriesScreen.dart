@@ -1,16 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-import 'package:http/http.dart';
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vool_test_project/BookmarkedCountriesScreen.dart';
+import 'package:vool_test_project/CountryDetailsScreen.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
-import 'package:vool_test_project/widgets/CountryItemWidget.dart';
 
-import 'helpers/Request.dart';
 import 'models/CountryListItem.dart';
-import 'models/ListItem.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -24,38 +21,18 @@ class CountriesScreen extends StatefulWidget {
 }
 
 class _CountriesScreenState extends State<CountriesScreen> {
-  //late Future<List<CountryDataModel>> futureCountryData;
-
-  // final response = await Request.Post('https://restcountries.com/v3.1/all?fields=name,flag,flags,capital,car,languages', {
-  //   'parameters': {
-  //     'flags': {'png': },
-  //     'area': _selectedGameArea,
-  //     'targetRR': _selectedTargetRR,
-  //     'hunterRR': _selectedHunterRR,
-  //     'maxHunters': _selectedMaxHunters,
-  //     'target': 'Me',
-  //     'captureProximity': _selectedCaptureProximity,
-  //     'entryFee': 0,
-  //     'allowBoosters': true,
-  //     'allowGuests': true,
-  //   },
-  //   'geo': {'x': longitude, 'y': latitude },
-  // });
-
-  // if (response != null) {
-  // final data = response;
-  //
-  // Notifications.ClaimPlayerTags(data['data']['playerId'].toString());
-  // // navigate to previous page
-  // Navigator.pop(context);
-  // }
 
   final items = List<CountryListItem>.generate(10,
       (i) => CountryListItem("Estonia", 1, "Tallinn", 10000, "EST", "left"));
 
+  Set<String> bookmarkedCountries = Set();
+
   @override
   void initState() {
+
     futureCountries = fetchCountriesData();
+    loadBookmarks();  // Load bookmarks when screen initialize
+    // s
     //futureCountryData = fetchCountries();
   }
 
@@ -85,16 +62,56 @@ class _CountriesScreenState extends State<CountriesScreen> {
 
   late Future<List<CountryModel>> futureCountries;
 
+  // Function to save bookmarks
+  Future<void> saveBookmarks() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('bookmarkedCountries', bookmarkedCountries.toList());
+  }
+
+// Function to load bookmarks on app start
+  Future<void> loadBookmarks() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? savedBookmarks = prefs.getStringList('bookmarkedCountries');
+    if (savedBookmarks != null) {
+      setState(() {
+        bookmarkedCountries = savedBookmarks.toSet();
+      });
+    }
+  }
+
+  void openBookmarks() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const BookmarkedCountriesScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text("Countries Screen"),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        actions: [
+          IconButton(onPressed: () => {}, icon: Icon(Icons.search)),
+          IconButton(onPressed: () => {
+            openBookmarks()
+          }, icon: Icon(Icons.bookmark)),
+        ],
       ),
       body: Center(
         child: FutureBuilder<List<CountryModel>>(
           future: futureCountries,
           builder: (context, snapshot) {
+            ElevatedButton(
+              onPressed: () {},
+              // style: ButtonStyle(elevation: MaterialStateProperty(12.0 )),
+              style: ElevatedButton.styleFrom(
+                  elevation: 12.0,
+                  textStyle: const TextStyle(color: Colors.yellow)),
+              child: const Text('Bookmarked Countries'),
+            );
             if (snapshot.hasData) {
               List<CountryModel> countries = snapshot.data!;
 
@@ -102,12 +119,13 @@ class _CountriesScreenState extends State<CountriesScreen> {
                 itemCount: countries.length,
                 itemBuilder: (context, index) {
                   CountryModel country = countries[index];
+                  bool isBookmarked = bookmarkedCountries.contains(country.capital ?? '');
                   return GestureDetector(
                     onTap: () {
                       Logger().e("ON TAP: country: "+country.capital.toString());
                       Logger().e("ON TAP: index: "+index.toString());
                       showDialog(context: context, builder: (BuildContext context){
-                        return BookmarkedCountriesScreen(model: country);
+                        return CountryDetailsScreen(model: country);
                       });
                     },
                     child: Container(
@@ -124,7 +142,27 @@ class _CountriesScreenState extends State<CountriesScreen> {
                         SizedBox(width: 10.0),
                         Text(country.capital ?? 'Unknown Capital'),
                         Expanded(child: SizedBox()),
-                        Image.asset(width: 20.0, height: 20.0, 'assets/images/bookmark.png')
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (isBookmarked) {
+                                // Unbookmark logic
+                                bookmarkedCountries.remove(country.capital);
+                              } else {
+                                // Bookmark logic
+                                bookmarkedCountries.add(country.capital ?? '');
+                              }
+                            });
+                            saveBookmarks();  // Call function to save bookmarks locally
+                          },
+                          child: Image.asset(
+                            width: 20.0,
+                            height: 20.0,
+                            isBookmarked
+                                ? 'assets/images/bookmark_filled.png' // A filled bookmark image
+                                : 'assets/images/bookmark.png',  // Empty bookmark image
+                          ),
+                        ),
                       ]),
                     ),
                   );
@@ -141,72 +179,3 @@ class _CountriesScreenState extends State<CountriesScreen> {
     );
   }
 }
-
-// @override
-// Widget build(BuildContext context) {
-//   return Scaffold(
-//     appBar: AppBar(
-//       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-//       title: Text(widget.title),
-//     ),
-//     // body: ListView.builder(
-//     //   // Let the ListView know how many items it needs to build.
-//     //   itemCount: items.length,
-//     //   // Provide a builder function. This is where the magic happens.
-//     //   // Convert each item into a widget based on the type of item it is.
-//     //   itemBuilder: (context, index) {
-//     //
-//     //
-//     //     final item = items[index];
-//     //
-//     //     return CountryItemWidget(
-//     //       capitalName: item.capitalName,
-//     //       image: item.flag,
-//     //     );
-//     //   },
-//     // ),
-//     body: Center(
-//       child: FutureBuilder<List<CountryDataModel>>(
-//         future: futureCountryData,  // Now it's a Future<List<CountryDataModel>>
-//         builder: (context, snapshot) {
-//           if (snapshot.hasData) {
-//             Logger().e("Data loaded");
-//
-//             // Example: Displaying the first country’s capital
-//             return ListView.builder(
-//               itemCount: snapshot.data?.length,
-//               itemBuilder: (context, index) {
-//                 final country = snapshot.data?[index];
-//                 return ListTile(
-//                   title: Text(snapshot.data?.first.nativeCommonName ?? 'Unknown'),
-//                   subtitle: Text('Capital: ${country?.capital?.first.toString() ?? 'N/A'}'),
-//                 );
-//               },
-//             );
-//           } else if (snapshot.hasError) {
-//             Logger().e("Data errror");
-//             return Text('${snapshot.error}');
-//           }
-//           return const CircularProgressIndicator();
-//         },
-//       ),
-//     ),
-//
-//     //body: Container(
-//     //  child:
-//       // child: Column(
-//       //   mainAxisAlignment: MainAxisAlignment.center,
-//       //   children: <Widget>[
-//       //
-//       //
-//       //
-//       //   ],
-//       // ),
-//     //),
-//     // floatingActionButton: FloatingActionButton(
-//     //   onPressed: (),
-//     //   tooltip: 'Increment',
-//     //   child: const Icon(Icons.add),
-//     // ),
-//   );
-// }
