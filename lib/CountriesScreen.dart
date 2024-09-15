@@ -123,6 +123,8 @@ class _CountriesScreenState extends State<CountriesScreen> {
                             country.pngFlag ?? 'N/A'),
                         SizedBox(width: 10.0),
                         Text(country.capital ?? 'Unknown Capital'),
+                        Expanded(child: SizedBox()),
+                        Image.asset(width: 20.0, height: 20.0, 'assets/images/bookmark.png')
                       ]),
                     ),
                   );
