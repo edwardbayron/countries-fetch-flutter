@@ -25,7 +25,7 @@ class _CountriesScreenState extends State<CountriesScreen> {
   final items = List<CountryListItem>.generate(10,
       (i) => CountryListItem("Estonia", 1, "Tallinn", 10000, "EST", "left"));
 
-  Set<String> bookmarkedCountries = Set();
+  Set<String> bookmarkedCountriesJson = Set();
 
   @override
   void initState() {
@@ -65,7 +65,7 @@ class _CountriesScreenState extends State<CountriesScreen> {
   // Function to save bookmarks
   Future<void> saveBookmarks() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('bookmarkedCountries', bookmarkedCountries.toList());
+    prefs.setStringList('bookmarkedCountries', bookmarkedCountriesJson.toList());
   }
 
 // Function to load bookmarks on app start
@@ -74,7 +74,7 @@ class _CountriesScreenState extends State<CountriesScreen> {
     List<String>? savedBookmarks = prefs.getStringList('bookmarkedCountries');
     if (savedBookmarks != null) {
       setState(() {
-        bookmarkedCountries = savedBookmarks.toSet();
+        bookmarkedCountriesJson = savedBookmarks.toSet();
       });
     }
   }
@@ -119,7 +119,7 @@ class _CountriesScreenState extends State<CountriesScreen> {
                 itemCount: countries.length,
                 itemBuilder: (context, index) {
                   CountryModel country = countries[index];
-                  bool isBookmarked = bookmarkedCountries.contains(country.capital ?? '');
+                  bool isBookmarked = bookmarkedCountriesJson.contains(jsonEncode(country.toJson()));
                   return GestureDetector(
                     onTap: () {
                       Logger().e("ON TAP: country: "+country.capital.toString());
@@ -145,12 +145,14 @@ class _CountriesScreenState extends State<CountriesScreen> {
                         GestureDetector(
                           onTap: () {
                             setState(() {
+                              String countryJson = jsonEncode(country.toJson());
+                              Logger().e("SAVED COUNTRY JSON: "+countryJson);
                               if (isBookmarked) {
                                 // Unbookmark logic
-                                bookmarkedCountries.remove(country.capital);
+                                bookmarkedCountriesJson.remove(countryJson);
                               } else {
                                 // Bookmark logic
-                                bookmarkedCountries.add(country.capital ?? '');
+                                bookmarkedCountriesJson.add(countryJson);
                               }
                             });
                             saveBookmarks();  // Call function to save bookmarks locally

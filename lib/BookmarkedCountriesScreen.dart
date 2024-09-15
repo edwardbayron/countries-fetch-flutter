@@ -7,7 +7,6 @@ import 'package:vool_test_project/CountryDetailsScreen.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
 
 
-import 'package:http/http.dart' as http;
 
 class BookmarkedCountriesScreen extends StatefulWidget {
   const BookmarkedCountriesScreen({super.key});
@@ -19,8 +18,6 @@ class BookmarkedCountriesScreen extends StatefulWidget {
 
 class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
 
-  Set<String> bookmarkedCountries = Set();
-  List<CountryModel> allCountries = []; // To store all countries initially
   List<CountryModel> bookmarkedCountriesList = [];
 
 
@@ -34,13 +31,19 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
     List<String>? savedBookmarks = prefs.getStringList('bookmarkedCountries');
     if (savedBookmarks != null) {
       setState(() {
-        bookmarkedCountries = savedBookmarks.toSet();
-        bookmarkedCountriesList = allCountries
-            .where((country) => bookmarkedCountries.contains(country.capital))
+        bookmarkedCountriesList = savedBookmarks
+            .map((countryJson) => CountryModel.fromJson(jsonDecode(countryJson)))
             .toList();
-        Logger().e("test: "+bookmarkedCountriesList.length.toString());
       });
     }
+  }
+
+  Future<void> saveBookmarks() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> bookmarkedCountriesJson = bookmarkedCountriesList
+        .map((country) => jsonEncode(country.toJson()))
+        .toList();
+    prefs.setStringList('bookmarkedCountries', bookmarkedCountriesJson);
   }
 
 
@@ -48,14 +51,18 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Logger().e("Test length: "+bookmarkedCountriesList.length.toString());
+    Logger().e("Test length: "+bookmarkedCountriesList.length.toString());
     return Scaffold(
       appBar: AppBar(
-        title: Text("Bookmarks"),
+        title: Text("Bookmarks Screen"),
       ),
       body: ListView.builder(
+        itemCount: bookmarkedCountriesList.length,
         itemBuilder: (context, index) {
           CountryModel country = bookmarkedCountriesList[index];
-
+          Logger().e("COUNTRY: png: "+country.pngFlag.toString());
+          Logger().e("COUNTRY: capital: "+country.capital.toString());
           return GestureDetector(
             onTap: () {
               showDialog(context: context, builder: (BuildContext context) {
@@ -78,10 +85,19 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
                   SizedBox(width: 10.0),
                   Text(country.capital ?? 'Unknown Capital'),
                   Expanded(child: SizedBox()),
-                  Image.asset(
-                    width: 20.0,
-                    height: 20.0,
-                    'assets/images/bookmark_filled.png', // Display filled bookmark
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        // Unbookmark logic
+                        bookmarkedCountriesList.removeAt(index);
+                      });
+                      saveBookmarks();  // Save updated bookmarks
+                    },
+                    child: Image.asset(
+                      width: 20.0,
+                      height: 20.0,
+                      'assets/images/bookmark_filled.png',  // Filled bookmark
+                    ),
                   ),
                 ],
               ),

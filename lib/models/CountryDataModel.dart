@@ -54,8 +54,16 @@ class CountryModel {
 
   factory CountryModel.fromJson(Map<String, dynamic> json) {
     return CountryModel(
-      capital: json['capital'] != null && (json['capital'] as List).isNotEmpty ? json['capital'][0] : 'N/A',
+      capital: json['capital'] != null && (json['capital']).isNotEmpty ? json['capital'][0] : 'N/A',
       pngFlag: json['flags']?['png'] as String?,
     );
+  }
+
+  Map<String, String?> toJson() {
+    return {
+      'capital': capital,
+      'pngFlag': pngFlag,
+      // Add other fields if necessary
+    };
   }
 }
