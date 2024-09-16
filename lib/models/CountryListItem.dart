@@ -4,7 +4,7 @@ import 'ListItem.dart';
 
 class CountryListItem implements ListItem{
   final String countryName;
-  final int flag; // switch after to Image data type
+  final int flag;
   final String capitalName;
   final int population;
   final String carSign;

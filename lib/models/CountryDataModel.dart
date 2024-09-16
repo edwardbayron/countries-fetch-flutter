@@ -61,8 +61,8 @@ class CountryModel {
 
   factory CountryModel.fromJsonV2(Map<String, dynamic> json) {
     return CountryModel(
-      capital: json['capital'] ?? 'Unknown Capital',  // Handling missing or null values
-      pngFlag: json['pngFlag'] ?? 'https://placeholder.com/flag.png', // Default image URL for missing values
+      capital: json['capital'] ?? 'Unknown Capital',
+      pngFlag: json['pngFlag'] ?? 'https://placeholder.com/flag.png',
     );
   }
 
@@ -70,7 +70,7 @@ class CountryModel {
     return {
       'capital': capital,
       'pngFlag': pngFlag,
-      // Add other fields if necessary
+
     };
   }
 }

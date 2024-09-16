@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; // For encoding/decoding JSON data
+import 'dart:convert';
 import 'models/CountryDataModel.dart';
 
 void main() => runApp(
@@ -39,21 +39,18 @@ class _DialogExampleState extends State<DialogExample> {
   @override
   void initState() {
     super.initState();
-    loadBookmarkStatus(); // Load bookmark status when the dialog opens
+    loadBookmarkStatus();
   }
 
-  // Method to load the bookmark status of the current country
   void loadBookmarkStatus() async {
     final prefs = await SharedPreferences.getInstance();
     List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ?? [];
 
-    // Check if the current country is already bookmarked
     setState(() {
       isBookmarked = savedBookmarks.contains(jsonEncode(widget.model.toJson()));
     });
   }
 
-  // Method to bookmark or unbookmark the country
   void toggleBookmark() async {
     final prefs = await SharedPreferences.getInstance();
     List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ?? [];
@@ -62,17 +59,16 @@ class _DialogExampleState extends State<DialogExample> {
 
     setState(() {
       if (isBookmarked) {
-        // If already bookmarked, remove the country
+
         savedBookmarks.remove(countryJson);
       } else {
-        // Add the country to bookmarks
+
         savedBookmarks.add(countryJson);
       }
 
       isBookmarked = !isBookmarked;
     });
 
-    // Save the updated list to SharedPreferences
     await prefs.setStringList('bookmarkedCountries', savedBookmarks);
   }
 

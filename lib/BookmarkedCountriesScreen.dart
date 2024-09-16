@@ -100,15 +100,15 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        // Unbookmark logic
+
                         bookmarkedCountriesList.removeAt(index);
                       });
-                      saveBookmarks(); // Save updated bookmarks
+                      saveBookmarks();
                     },
                     child: Image.asset(
                       width: 20.0,
                       height: 20.0,
-                      'assets/images/bookmark_filled.png', // Filled bookmark
+                      'assets/images/bookmark_filled.png',
                     ),
                   ),
                 ],

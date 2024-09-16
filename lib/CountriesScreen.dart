@@ -27,7 +27,7 @@ class _CountriesScreenState extends State<CountriesScreen> {
   void initState() {
 
     futureCountries = fetchCountriesData();
-    loadBookmarks();  // Load bookmarks when screen initialize
+    loadBookmarks();
     // s
     //futureCountryData = fetchCountries();
   }
@@ -38,8 +38,7 @@ class _CountriesScreenState extends State<CountriesScreen> {
     Logger logger = new Logger();
     var jsonData = jsonDecode(response.body);
 
-    // Log the full JSON response
-    //logger.e(jsonEncode(jsonData));  // Logs full JSON
+    //logger.e(jsonEncode(jsonData));
     logger.e(jsonData);
     return response;
   }
@@ -56,15 +55,11 @@ class _CountriesScreenState extends State<CountriesScreen> {
     }
   }
 
-
-
-  // Function to save bookmarks
   Future<void> saveBookmarks() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setStringList('bookmarkedCountries', bookmarkedCountriesJson.toList());
   }
 
-// Function to load bookmarks on app start
   Future<void> loadBookmarks() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? savedBookmarks = prefs.getStringList('bookmarkedCountries');
@@ -102,7 +97,6 @@ class _CountriesScreenState extends State<CountriesScreen> {
           builder: (context, snapshot) {
             ElevatedButton(
               onPressed: () {},
-              // style: ButtonStyle(elevation: MaterialStateProperty(12.0 )),
               style: ElevatedButton.styleFrom(
                   elevation: 12.0,
                   textStyle: const TextStyle(color: Colors.yellow)),
