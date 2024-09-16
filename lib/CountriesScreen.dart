@@ -12,9 +12,7 @@ import 'models/CountryListItem.dart';
 import 'package:http/http.dart' as http;
 
 class CountriesScreen extends StatefulWidget {
-  const CountriesScreen({super.key, required this.title});
-
-  final String title;
+  const CountriesScreen({super.key});
 
   @override
   State<CountriesScreen> createState() => _CountriesScreenState();
@@ -22,10 +20,8 @@ class CountriesScreen extends StatefulWidget {
 
 class _CountriesScreenState extends State<CountriesScreen> {
 
-  final items = List<CountryListItem>.generate(10,
-      (i) => CountryListItem("Estonia", 1, "Tallinn", 10000, "EST", "left"));
-
   Set<String> bookmarkedCountriesJson = Set();
+  late Future<List<CountryModel>> futureCountries;
 
   @override
   void initState() {
@@ -60,7 +56,7 @@ class _CountriesScreenState extends State<CountriesScreen> {
     }
   }
 
-  late Future<List<CountryModel>> futureCountries;
+
 
   // Function to save bookmarks
   Future<void> saveBookmarks() async {

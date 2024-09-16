@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert'; // For encoding/decoding JSON data
 import 'models/CountryDataModel.dart';
 
-/// Flutter code sample for [AlertDialog].
-
 void main() => runApp(
-    CountryDetailsScreen(model: CountryModel(capital: '', pngFlag: '')));
+    CountryDetailsScreen(model: CountryModel(capital: 'Tallinn', pngFlag: 'https://flagcdn.com/w320/ee.png')));
 
 class CountryDetailsScreen extends StatelessWidget {
   final CountryModel model;
@@ -25,87 +24,110 @@ class CountryDetailsScreen extends StatelessWidget {
   }
 }
 
-class DialogExample extends StatelessWidget {
+class DialogExample extends StatefulWidget {
   final CountryModel model;
 
   const DialogExample({super.key, required this.model});
 
   @override
+  State<DialogExample> createState() => _DialogExampleState();
+}
+
+class _DialogExampleState extends State<DialogExample> {
+  bool isBookmarked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadBookmarkStatus(); // Load bookmark status when the dialog opens
+  }
+
+  // Method to load the bookmark status of the current country
+  void loadBookmarkStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ?? [];
+
+    // Check if the current country is already bookmarked
+    setState(() {
+      isBookmarked = savedBookmarks.contains(jsonEncode(widget.model.toJson()));
+    });
+  }
+
+  // Method to bookmark or unbookmark the country
+  void toggleBookmark() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ?? [];
+
+    String countryJson = jsonEncode(widget.model.toJson());
+
+    setState(() {
+      if (isBookmarked) {
+        // If already bookmarked, remove the country
+        savedBookmarks.remove(countryJson);
+      } else {
+        // Add the country to bookmarks
+        savedBookmarks.add(countryJson);
+      }
+
+      isBookmarked = !isBookmarked;
+    });
+
+    // Save the updated list to SharedPreferences
+    await prefs.setStringList('bookmarkedCountries', savedBookmarks);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // return TextButton(
-    //   onPressed: () => showDialog<String>(
-    //     context: context,
-    //     builder: (BuildContext context) => AlertDialog(
-    //       title: Text('Capital: ${model.capital}'),
-    //       content: const Text('AlertDialog description'),
-    //       actions: <Widget>[
-    //         TextButton(
-    //           onPressed: () => Navigator.pop(context, 'Cancel'),
-    //           child: const Text('Cancel'),
-    //         ),
-    //         TextButton(
-    //           onPressed: () => Navigator.pop(context, 'OK'),
-    //           child: const Text('OK'),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    //   child: const Text('Show Dialog'),
-    // );
-
-    return Material(
-        child: Container(
-          width: 400,
-            padding: const EdgeInsets.fromLTRB(40.0, 70.0, 40.0, 50.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-            ),
-            child: Column(
-              children: [
-
-                Row(
-                  children: [
-                    Text('Country name'),
-                    SizedBox(width: 10.0),
-                    Text('${model.capital}'),
-                    SizedBox(width: 10.0),
-                    Image.network(
-                        width: 20.0,
-                        height: 20.0,
-                        model.pngFlag ?? 'N/A'),
-
-                  ],
-                ),
-                SizedBox(height: 10.0),
-                Row(
-                  children: [
-                    Text('Population'),
-                  ],
-                ),
-                SizedBox(height: 10.0),
-                Row(
-                  children: [
-                    Text('Car sign'),
-                    SizedBox(width: 10.0),
-                    Text('Card driving side')
-                  ],
-                ),
-                SizedBox(height: 10.0),
-                // ListView.builder(
-                // itemCount: 2,
-                // itemBuilder: (context, index) {
-                //   Row(children: [
-                //     Text('Finnish'),
-                //     SizedBox(width: 10.0),
-                //     Text('Suomi')
-                //   ],);
-                // }),
-
-
-
-
-
-              ],
-            )));
+    return AlertDialog(
+      title: const Text('Country details'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const Text('Country name:'),
+              const SizedBox(width: 10.0),
+              Text(widget.model.capital ?? 'Unknown Capital'),
+              const SizedBox(width: 10.0),
+              Image.network(
+                widget.model.pngFlag ?? 'N/A',
+                width: 20.0,
+                height: 20.0,
+              ),
+            ],
+          ),
+          const SizedBox(height: 10.0),
+          Row(
+            children: [
+              const Text('Population:'),
+              // Placeholder for population data, modify based on your data
+            ],
+          ),
+          const SizedBox(height: 10.0),
+          Row(
+            children: [
+              const Text('Car sign:'),
+              const SizedBox(width: 10.0),
+              const Text('Card driving side'),
+            ],
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(
+            isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+            color: isBookmarked ? Colors.blue : Colors.grey,
+          ),
+          onPressed: toggleBookmark,
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context); // Close the dialog
+          },
+          child: const Text('Close'),
+        ),
+      ],
+    );
   }
 }
