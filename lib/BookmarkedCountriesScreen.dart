@@ -6,20 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vool_test_project/CountryDetailsScreen.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
 
-
-
 class BookmarkedCountriesScreen extends StatefulWidget {
   const BookmarkedCountriesScreen({super.key});
-
 
   @override
   State<BookmarkedCountriesScreen> createState() => _CountriesScreenState();
 }
 
 class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
-
   List<CountryModel> bookmarkedCountriesList = [];
-
 
   @override
   void initState() {
@@ -31,9 +26,21 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
     List<String>? savedBookmarks = prefs.getStringList('bookmarkedCountries');
     if (savedBookmarks != null) {
       setState(() {
-        bookmarkedCountriesList = savedBookmarks
-            .map((countryJson) => CountryModel.fromJson(jsonDecode(countryJson)))
-            .toList();
+        Logger().e("YOLO: 1: " + savedBookmarks.first);
+
+        // bookmarkedCountriesList = savedBookmarks.map((countryJson) {
+        //   Logger().e("Decoded JSON: $countryJson");
+        //   return CountryModel.fromJson(jsonDecode(countryJson));
+        // }).toList();
+
+        List<dynamic> data = jsonDecode(savedBookmarks.toString());
+        bookmarkedCountriesList = data.map((json) => CountryModel.fromJsonV2(json)).toList();
+
+        for(var item in savedBookmarks){
+          Logger().e("item: "+item);
+          //Logger().e("item list: "+CountryModel.fromJson(jsonDecode(item)));
+        }
+
       });
     }
   }
@@ -46,13 +53,12 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
     prefs.setStringList('bookmarkedCountries', bookmarkedCountriesJson);
   }
 
-
   late Future<List<CountryModel>> futureCountries;
 
   @override
   Widget build(BuildContext context) {
-    Logger().e("Test length: "+bookmarkedCountriesList.length.toString());
-    Logger().e("Test length: "+bookmarkedCountriesList.length.toString());
+    Logger().e("Test length: " + bookmarkedCountriesList.length.toString());
+    Logger().e("Test length: " + bookmarkedCountriesList.length.toString());
     return Scaffold(
       appBar: AppBar(
         title: Text("Bookmarks Screen"),
@@ -60,20 +66,26 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
       body: ListView.builder(
         itemCount: bookmarkedCountriesList.length,
         itemBuilder: (context, index) {
+          Logger().e("YOLO: 2 capital: " +
+              bookmarkedCountriesList.first.capital.toString());
+          Logger().e("YOLO: 2 png: " +
+              bookmarkedCountriesList.first.pngFlag.toString());
           CountryModel country = bookmarkedCountriesList[index];
-          Logger().e("COUNTRY: png: "+country.pngFlag.toString());
-          Logger().e("COUNTRY: capital: "+country.capital.toString());
+          Logger().e("COUNTRY: png: " + country.pngFlag.toString());
+          Logger().e("COUNTRY: capital: " + country.capital.toString());
           return GestureDetector(
             onTap: () {
-              showDialog(context: context, builder: (BuildContext context) {
-                return CountryDetailsScreen(model: country);
-              });
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return CountryDetailsScreen(model: country);
+                  });
             },
             child: Container(
               padding: EdgeInsets.all(10.0),
               margin: EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black54)),
+              decoration:
+                  BoxDecoration(border: Border.all(color: Colors.black54)),
               height: 60.0,
               child: Row(
                 children: [
@@ -91,12 +103,12 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
                         // Unbookmark logic
                         bookmarkedCountriesList.removeAt(index);
                       });
-                      saveBookmarks();  // Save updated bookmarks
+                      saveBookmarks(); // Save updated bookmarks
                     },
                     child: Image.asset(
                       width: 20.0,
                       height: 20.0,
-                      'assets/images/bookmark_filled.png',  // Filled bookmark
+                      'assets/images/bookmark_filled.png', // Filled bookmark
                     ),
                   ),
                 ],
@@ -108,4 +120,3 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
     );
   }
 }
-
