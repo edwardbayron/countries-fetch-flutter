@@ -11,7 +11,8 @@ void main() => runApp(
             countryName: 'Estonia',
             carSigns: ['EST'],
             carDrivingSide: 'right',
-            languages: null
+            languages: null,
+            nativeNames: null
         )));
 
 class CountryDetailsScreen extends StatelessWidget {
@@ -117,9 +118,19 @@ class _DialogExampleState extends State<DialogExample> {
               Text('Card driving side: '+widget.model.carDrivingSide.toString()),
             ],
           ),
+          // for (var entry in widget.model.languages!.entries)
+          //   Text('Language (${entry.key}): ${entry.value}'),
+          // Text("Common: "+widget.model.getNativeCommonNames(widget.model)),
+          // for(var i in widget.model.getNativeCodes(widget.model))
+          //   Text(i),
+
           for (var entry in widget.model.languages!.entries)
-            Text('Language (${entry.key}): ${entry.value}'),
-          Text('Native name common: ')
+            if (widget.model.nativeNames!.containsKey(entry.key))
+              Text('Language (${entry.value}): '+widget.model.nativeNames![entry.key]['common'])
+
+
+
+
         ],
       ),
       actions: [
