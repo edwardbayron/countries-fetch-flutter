@@ -6,9 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vool_test_project/BookmarkedCountriesScreen.dart';
 import 'package:vool_test_project/CountryDetailsScreen.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
-
-import 'models/CountryListItem.dart';
-
 import 'package:http/http.dart' as http;
 
 class CountriesScreen extends StatefulWidget {
@@ -28,19 +25,6 @@ class _CountriesScreenState extends State<CountriesScreen> {
 
     futureCountries = fetchCountriesData();
     loadBookmarks();
-    // s
-    //futureCountryData = fetchCountries();
-  }
-
-  Future<http.Response> requestCountriesData() async {
-    final response = await http.get(Uri.parse(
-        'https://restcountries.com/v3.1/all?fields=name,flag,flags,capital,car,languages'));
-    Logger logger = new Logger();
-    var jsonData = jsonDecode(response.body);
-
-    //logger.e(jsonEncode(jsonData));
-    logger.e(jsonData);
-    return response;
   }
 
   Future<List<CountryModel>> fetchCountriesData() async {
@@ -48,6 +32,7 @@ class _CountriesScreenState extends State<CountriesScreen> {
         'https://restcountries.com/v3.1/all?fields=name,flag,flags,capital,car,languages'));
 
     if (response.statusCode == 200) {
+      Logger().e("COUNTRIES SCREEN YOLO SAVED BOOKMARKS 3: " + response.body);
       List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => CountryModel.fromJson(json)).toList();
     } else {
@@ -135,24 +120,22 @@ class _CountriesScreenState extends State<CountriesScreen> {
                         GestureDetector(
                           onTap: () {
                             setState(() {
-                              String countryJson = jsonEncode(country.toJson());
+                              String countryJson = jsonEncode(country);
                               Logger().e("SAVED COUNTRY JSON: "+countryJson);
                               if (isBookmarked) {
-                                // Unbookmark logic
                                 bookmarkedCountriesJson.remove(countryJson);
                               } else {
-                                // Bookmark logic
                                 bookmarkedCountriesJson.add(countryJson);
                               }
                             });
-                            saveBookmarks();  // Call function to save bookmarks locally
+                            saveBookmarks();
                           },
                           child: Image.asset(
                             width: 20.0,
                             height: 20.0,
                             isBookmarked
-                                ? 'assets/images/bookmark_filled.png' // A filled bookmark image
-                                : 'assets/images/bookmark.png',  // Empty bookmark image
+                                ? 'assets/images/bookmark_filled.png'
+                                : 'assets/images/bookmark.png',
                           ),
                         ),
                       ]),

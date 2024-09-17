@@ -69,20 +69,19 @@ class CountryModel {
       carSigns: json['car']?['signs'],
       carDrivingSide: json['car']?['side'] as String?,
       languages: json['languages'],
-        nativeNames: json['name']?['nativeName']
+      nativeNames: json['name']?['nativeName']
     );
   }
 
   factory CountryModel.fromJsonV2(Map<String, dynamic> json) {
     return CountryModel(
-      capital: json['capital'] ?? 'Unknown Capital',
-      pngFlag: json['pngFlag'] ?? 'https://placeholder.com/flag.png',
-      countryName: json['name']?['common'] ?? "Unknown Country",
-      carSigns: json['car']?['signs'],
-      carDrivingSide: json['car']?['side'] as String?,
-      languages: json['languages'],
-        nativeNames: json['name']?['nativeName'] as Map<String, dynamic>?
-
+        capital: json['capital'] != null && (json['capital']).isNotEmpty ? json['capital'][0] : 'N/A',
+        pngFlag: json['flags']?['png'] as String?,
+        countryName: json['name']?['common'] as String?,
+        carSigns: json['car']?['signs'],
+        carDrivingSide: json['car']?['side'] as String?,
+        languages: json['languages'],
+        nativeNames: json['name']?['nativeName']
     );
   }
 
