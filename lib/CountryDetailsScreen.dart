@@ -4,7 +4,15 @@ import 'dart:convert';
 import 'models/CountryDataModel.dart';
 
 void main() => runApp(
-    CountryDetailsScreen(model: CountryModel(capital: 'Tallinn', pngFlag: 'https://flagcdn.com/w320/ee.png')));
+    CountryDetailsScreen(
+        model: CountryModel(
+            capital: 'Tallinn',
+            pngFlag: 'https://flagcdn.com/w320/ee.png',
+            countryName: 'Estonia',
+            carSigns: ['EST'],
+            carDrivingSide: 'right',
+            languages: null
+        )));
 
 class CountryDetailsScreen extends StatelessWidget {
   final CountryModel model;
@@ -75,13 +83,12 @@ class _DialogExampleState extends State<DialogExample> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Country details'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
+          Column(
             children: [
-              const Text('Country name:'),
+              Text(widget.model.countryName ?? 'Unknown Country'),
               const SizedBox(width: 10.0),
               Text(widget.model.capital ?? 'Unknown Capital'),
               const SizedBox(width: 10.0),
@@ -102,11 +109,17 @@ class _DialogExampleState extends State<DialogExample> {
           const SizedBox(height: 10.0),
           Row(
             children: [
-              const Text('Car sign:'),
-              const SizedBox(width: 10.0),
-              const Text('Card driving side'),
+              Text('Car signs: '+widget.model.carSigns.toString()),
             ],
           ),
+          Row(
+            children: [
+              Text('Card driving side: '+widget.model.carDrivingSide.toString()),
+            ],
+          ),
+          for (var entry in widget.model.languages!.entries)
+            Text('Language (${entry.key}): ${entry.value}'),
+          Text('Native name common: ')
         ],
       ),
       actions: [
