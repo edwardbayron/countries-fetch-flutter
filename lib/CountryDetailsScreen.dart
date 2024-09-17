@@ -3,17 +3,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'models/CountryDataModel.dart';
 
-void main() => runApp(
-    CountryDetailsScreen(
-        model: CountryModel(
-            capital: 'Tallinn',
-            pngFlag: 'https://flagcdn.com/w320/ee.png',
-            countryName: 'Estonia',
-            carSigns: ['EST'],
-            carDrivingSide: 'right',
-            languages: null,
-            nativeNames: null
-        )));
+void main() =>
+    runApp(
+        CountryDetailsScreen(
+            model: CountryModel(
+                capital: 'Tallinn',
+                pngFlag: 'https://flagcdn.com/w320/ee.png',
+                countryName: 'Estonia',
+                carSigns: ['EST'],
+                carDrivingSide: 'right',
+                languages: null,
+                nativeNames: null
+            )));
 
 class CountryDetailsScreen extends StatelessWidget {
   final CountryModel model;
@@ -53,7 +54,8 @@ class _DialogExampleState extends State<DialogExample> {
 
   void loadBookmarkStatus() async {
     final prefs = await SharedPreferences.getInstance();
-    List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ?? [];
+    List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ??
+        [];
 
     setState(() {
       isBookmarked = savedBookmarks.contains(jsonEncode(widget.model.toJson()));
@@ -62,16 +64,15 @@ class _DialogExampleState extends State<DialogExample> {
 
   void toggleBookmark() async {
     final prefs = await SharedPreferences.getInstance();
-    List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ?? [];
+    List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ??
+        [];
 
     String countryJson = jsonEncode(widget.model.toJson());
 
     setState(() {
       if (isBookmarked) {
-
         savedBookmarks.remove(countryJson);
       } else {
-
         savedBookmarks.add(countryJson);
       }
 
@@ -85,37 +86,49 @@ class _DialogExampleState extends State<DialogExample> {
   Widget build(BuildContext context) {
     return AlertDialog(
       content: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Column(
             children: [
-              Text(widget.model.countryName ?? 'Unknown Country'),
-              const SizedBox(width: 10.0),
-              Text(widget.model.capital ?? 'Unknown Capital'),
-              const SizedBox(width: 10.0),
-              Image.network(
-                widget.model.pngFlag ?? 'N/A',
-                width: 20.0,
-                height: 20.0,
+              Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(widget.model.countryName ?? 'Unknown Country'),
+              ),
+
+              SizedBox(width: 10.0),
+              Align(
+                alignment: Alignment.centerLeft,
+                child:
+                Text(widget.model.capital ?? 'Unknown Capital'),
+              ),
+
+              SizedBox(width: 10.0),
+              Align(
+                alignment: Alignment.centerLeft,
+                child:
+                Image.network(
+                  widget.model.pngFlag ?? 'N/A',
+                  width: 20.0,
+                  height: 20.0,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 10.0),
+          SizedBox(height: 10.0),
           Row(
             children: [
-              const Text('Population:'),
-              // Placeholder for population data, modify based on your data
+              Text('Population: [to be added]'),
             ],
           ),
           const SizedBox(height: 10.0),
           Row(
             children: [
-              Text('Car signs: '+widget.model.carSigns.toString()),
+              Text('Car signs: ' + widget.model.carSigns.toString()),
             ],
           ),
           Row(
             children: [
-              Text('Card driving side: '+widget.model.carDrivingSide.toString()),
+              Text('Card driving side: ' +
+                  widget.model.carDrivingSide.toString()),
             ],
           ),
           // for (var entry in widget.model.languages!.entries)
@@ -124,11 +137,20 @@ class _DialogExampleState extends State<DialogExample> {
           // for(var i in widget.model.getNativeCodes(widget.model))
           //   Text(i),
 
-          for (var entry in widget.model.languages!.entries)
-            if (widget.model.nativeNames!.containsKey(entry.key))
-              Text('Language (${entry.value}): '+widget.model.nativeNames![entry.key]['common'])
+          Column(
+            children: [
+              for (var entry in widget.model.languages!.entries)
+                if (widget.model.nativeNames!.containsKey(entry.key))
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child:
+                    Text('${entry.value}: ' + widget.model.nativeNames![entry
+                        .key]['common'])
+                    ,
+                  )
 
-
+            ],
+          ),
 
 
         ],
