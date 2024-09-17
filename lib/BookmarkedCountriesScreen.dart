@@ -16,7 +16,7 @@ class BookmarkedCountriesScreen extends StatefulWidget {
 }
 
 class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
-  late List<CountryModel> bookmarkedCountriesList;
+  late Future<List<CountryModel>> bookmarkedCountriesList;
   Set<String> bookmarkedCountriesJson = Set();
 
   @override
@@ -30,7 +30,7 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
   //   }).toList();
   //   return Future.value(countriesList);
   // }
-  List<CountryModel> getBookmarkedCountries(String json) {
+  Future<List<CountryModel>> getBookmarkedCountries(String json) async {
     List<dynamic> data = jsonDecode(json);
     return data.map((json) => CountryModel.fromJson(json)).toList();
   }
@@ -44,12 +44,13 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
 
     if (savedBookmarks != null) {
       bookmarkedCountriesJson = savedBookmarks.toSet();
+      bookmarkedCountriesList = getBookmarkedCountries(savedBookmarks.toString());
     }
 
     // After loading bookmarks, initialize the future list
-    setState(() {
-      bookmarkedCountriesList = getBookmarkedCountries(savedBookmarks.toString());
-    });
+    //setState(() {
+
+    //});
   }
 
 
@@ -65,54 +66,65 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
           title: Text("Bookmarks Screen"),
         ),
         body: Center(
-            child:
-            ListView.builder(
-                      itemCount: bookmarkedCountriesList.length,
-                      itemBuilder: (context, index) {
-                        // Logger().e("YOLO: 2 capital: " +
-                        //     bookmarkedCountriesList.first.capital.toString());
-                        // Logger().e("YOLO: 2 png: " +
-                        //     bookmarkedCountriesList.first.pngFlag.toString());
-                        CountryModel country = bookmarkedCountriesList[index];
-                        Logger()
-                            .e("COUNTRY: png: " + country.pngFlag.toString());
-                        Logger().e(
-                            "COUNTRY: capital: " +
-                                country.capital.toString());
-                        return GestureDetector(
-                          onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return CountryDetailsScreen(model: country);
-                                });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10.0),
-                            margin: EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black54)),
-                            height: 60.0,
-                            child: Row(
-                              children: [
-                                Image.network(
-                                  width: 20.0,
-                                  height: 20.0,
-                                  country.pngFlag ?? 'N/A',
-                                ),
-                                SizedBox(width: 10.0),
-                                Text(country.capital ?? 'Unknown Capital'),
-                                Expanded(child: SizedBox()),
-                              ],
-                            ),
+          child: FutureBuilder<List<CountryModel>>(
+          future: bookmarkedCountriesList,
+          builder: (context, snapshot) {
+            if(snapshot.hasData) {
+              List<CountryModel> countries = snapshot.data!;
+              return ListView.builder(
+
+                itemCount: countries.length,
+                itemBuilder: (context, index) {
+                  // Logger().e("YOLO: 2 capital: " +
+                  //     bookmarkedCountriesList.first.capital.toString());
+                  // Logger().e("YOLO: 2 png: " +
+                  //     bookmarkedCountriesList.first.pngFlag.toString());
+                  CountryModel country = countries[index];
+                  Logger()
+                      .e("COUNTRY: png: " + country.pngFlag.toString());
+                  Logger().e(
+                      "COUNTRY: capital: " +
+                          country.capital.toString());
+                  return GestureDetector(
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return CountryDetailsScreen(model: country);
+                          });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(10.0),
+                      margin: EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black54)),
+                      height: 60.0,
+                      child: Row(
+                        children: [
+                          Image.network(
+                            width: 20.0,
+                            height: 20.0,
+                            country.pngFlag ?? 'N/A',
                           ),
-                        );
-                      },
+                          SizedBox(width: 10.0),
+                          Text(country.capital ?? 'Unknown Capital'),
+                          Expanded(child: SizedBox()),
+                        ],
+                      ),
+                    ),
+                  );
+                },
 
 
+              );
+            }
+            else if(snapshot.hasError){
+              Text("Error snapshot has no data");
+            }
 
+            return const CircularProgressIndicator();
+          }
 
-
-                )));
+          )));
   }
 }
