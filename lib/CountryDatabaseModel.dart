@@ -8,8 +8,8 @@ class CountryDatabaseModel {
   final String? countryName;
   final String? carSigns;
   final String? carDrivingSide;
-  final String? languages;
-  final String? nativeNames;
+  final String languages;
+  final String nativeNames;
 
   CountryDatabaseModel({this.id, required this.capital, required this.pngFlag, required this.countryName, required this.carSigns, required this.carDrivingSide, required this.languages, required this.nativeNames});
 

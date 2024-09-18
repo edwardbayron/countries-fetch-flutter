@@ -22,8 +22,8 @@ void main() =>
               countryName: 'Estonia',
               carSigns: 'EST',
               carDrivingSide: 'right',
-              languages: null,
-              nativeNames: null),
+              languages: '',
+              nativeNames: ''),
         ));
 
 class CountryDetailsScreen extends StatelessWidget {
@@ -182,15 +182,18 @@ class _DialogExampleState extends State<DialogExample> {
                           .key]['common'])
                       ,
                     )
-              else
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child:
-                      Text("Languages: ${widget.dbModel.languages}")
-                      ,
-                    )
+
+
             ],
           ),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var entry in jsonDecode(widget.dbModel.languages).entries)
+                Text('${entry.value}: ${jsonDecode(widget.dbModel.nativeNames)[entry.key]['common']}'),
+            ],
+          )
 
 
         ],

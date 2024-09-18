@@ -113,8 +113,8 @@ class _CountriesScreenState extends State<CountriesScreen> {
                             countryName: '',
                             carSigns: '',
                             carDrivingSide: '',
-                            languages: null,
-                            nativeNames: null));
+                            languages: '',
+                            nativeNames: ''));
                       });
                     },
                     child: Container(
