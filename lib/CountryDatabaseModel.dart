@@ -9,15 +9,15 @@ class CountryDatabaseModel {
   final String? carSigns;
   final String? carDrivingSide;
   final String? languages;
-  final String nativeNames;
+  final String? nativeNames;
 
   CountryDatabaseModel({this.id, required this.capital, required this.pngFlag, required this.countryName, required this.carSigns, required this.carDrivingSide, required this.languages, required this.nativeNames});
 
   factory CountryDatabaseModel.fromJsonDb(Map<String, dynamic> json) => CountryDatabaseModel(
       capital: json['capital'],
       pngFlag: json['pngFlag'].toString().replaceAll('"', ""),
-      countryName: json['name']?['common'],
-      carSigns: json['carSigns'],
+      countryName: json['countryName'],
+      carSigns: json['carSigns'].toString(),
       carDrivingSide: json['carDrivingSide'],
       languages: json['languages'],
       nativeNames: json['nativeNames']);

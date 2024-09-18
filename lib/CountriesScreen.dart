@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:vool_test_project/BookmarkedCountriesScreen.dart';
+import 'package:vool_test_project/CountryDatabaseModel.dart';
 import 'package:vool_test_project/CountryDetailsScreen.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
 import 'package:http/http.dart' as http;
@@ -106,7 +107,14 @@ class _CountriesScreenState extends State<CountriesScreen> {
                   return GestureDetector(
                     onTap: () {
                       showDialog(context: context, builder: (BuildContext context){
-                        return CountryDetailsScreen(model: country);
+                        return CountryDetailsScreen(model: country, dbModel: CountryDatabaseModel(
+                            capital: '',
+                            pngFlag: '',
+                            countryName: '',
+                            carSigns: '',
+                            carDrivingSide: '',
+                            languages: null,
+                            nativeNames: null));
                       });
                     },
                     child: Container(

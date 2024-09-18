@@ -166,7 +166,13 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
             );
             if (snapshot.hasData) {
               for(var item in snapshot.data!){
-                Logger().e("TEST SNAPSHOT: "+item.toString());
+                Logger().e("TEST SNAPSHOT: "+item.capital.toString());
+                Logger().e("TEST SNAPSHOT: "+item.pngFlag.toString());
+                Logger().e("TEST SNAPSHOT: "+item.countryName.toString());
+                Logger().e("TEST SNAPSHOT: "+item.carSigns.toString());
+                Logger().e("TEST SNAPSHOT: "+item.carDrivingSide.toString());
+                Logger().e("TEST SNAPSHOT: "+item.languages.toString());
+                Logger().e("TEST SNAPSHOT: "+item.nativeNames.toString());
               }
               List<CountryDatabaseModel> countries = snapshot.data!;
 
@@ -177,9 +183,17 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
                   bool isBookmarked = bookmarkedCountriesJson.contains(jsonEncode(country.toJson()));
                   return GestureDetector(
                     onTap: () {
-                      // showDialog(context: context, builder: (BuildContext context){
-                      //   return CountryDetailsScreen(model: country);
-                      // });
+                      showDialog(context: context, builder: (BuildContext context){
+                        return CountryDetailsScreen(model: CountryModel(
+                            capital: '',
+                            pngFlag: '',
+                            countryName: '',
+                            carSigns: [''],
+                            carDrivingSide: '',
+                            languages: null,
+                            nativeNames: null
+                        ), dbModel: country);
+                      });
                     },
                     child: Container(
                       padding: EdgeInsets.all(10.0),

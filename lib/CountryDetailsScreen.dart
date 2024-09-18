@@ -15,13 +15,22 @@ void main() =>
                 carDrivingSide: 'right',
                 languages: null,
                 nativeNames: null
-            )));
+            ),
+          dbModel: CountryDatabaseModel(
+              capital: 'Tallinn',
+              pngFlag: 'https://flagcdn.com/w320/ee.png',
+              countryName: 'Estonia',
+              carSigns: 'EST',
+              carDrivingSide: 'right',
+              languages: null,
+              nativeNames: null),
+        ));
 
 class CountryDetailsScreen extends StatelessWidget {
   final CountryModel model;
-  //final CountryDatabaseModel dbModel;
+  final CountryDatabaseModel dbModel;
 
-  const CountryDetailsScreen({super.key, required this.model});
+  CountryDetailsScreen({super.key, required this.model, required this.dbModel});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +38,7 @@ class CountryDetailsScreen extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(title: const Text('Country details')),
         body: Center(
-          child: DialogExample(model: model),
+          child: DialogExample(model: model, dbModel: dbModel),
         ),
       ),
     );
@@ -38,8 +47,10 @@ class CountryDetailsScreen extends StatelessWidget {
 
 class DialogExample extends StatefulWidget {
   final CountryModel model;
+  final CountryDatabaseModel dbModel;
 
-  const DialogExample({super.key, required this.model});
+  DialogExample({super.key, required this.model, required this.dbModel});
+
 
   @override
   State<DialogExample> createState() => _DialogExampleState();
@@ -60,7 +71,7 @@ class _DialogExampleState extends State<DialogExample> {
         [];
 
     setState(() {
-      isBookmarked = savedBookmarks.contains(jsonEncode(widget.model.toJson()));
+      isBookmarked = savedBookmarks.contains(jsonEncode(widget.model?.toJson()));
     });
   }
 
@@ -69,7 +80,7 @@ class _DialogExampleState extends State<DialogExample> {
     List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ??
         [];
 
-    String countryJson = jsonEncode(widget.model.toJson());
+    String countryJson = jsonEncode(widget.model?.toJson());
 
     setState(() {
       if (isBookmarked) {
@@ -91,28 +102,52 @@ class _DialogExampleState extends State<DialogExample> {
         children: [
           Column(
             children: [
-              Align(
+              if(widget.model.countryName?.isNotEmpty == true)
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child:
+                       Text("Country name: ${widget.model.countryName}"))
+              else
+                  Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(widget.model.countryName ?? 'Unknown Country'),
+                  child:
+                  Text("Country name: ${widget.dbModel.countryName}"),
               ),
 
               SizedBox(width: 10.0),
-              Align(
-                alignment: Alignment.centerLeft,
-                child:
-                Text(widget.model.capital ?? 'Unknown Capital'),
-              ),
-
-              SizedBox(width: 10.0),
-              Align(
-                alignment: Alignment.centerLeft,
-                child:
-                Image.network(
-                  widget.model.pngFlag ?? 'N/A',
-                  width: 20.0,
-                  height: 20.0,
+              if(widget.model.capital?.isNotEmpty == true)
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child:
+                    Text("Capital: ${widget.model.capital}"))
+              else
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child:
+                  Text("Capital: ${widget.dbModel.capital}"),
                 ),
-              ),
+
+              SizedBox(width: 10.0),
+              if(widget.model.pngFlag?.isNotEmpty == true)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child:
+                  Image.network(
+                    widget.model.pngFlag ?? 'N/A',
+                    width: 20.0,
+                    height: 20.0,
+                  ),
+                )
+              else
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child:
+                  Image.network(
+                    widget.dbModel.pngFlag ?? 'N/A',
+                    width: 20.0,
+                    height: 20.0,
+                  ),
+                ),
             ],
           ),
           SizedBox(height: 10.0),
@@ -122,35 +157,38 @@ class _DialogExampleState extends State<DialogExample> {
             ],
           ),
           const SizedBox(height: 10.0),
+          if(widget.dbModel.carSigns.toString().isNotEmpty)
+            Text('Car signs: ${widget.dbModel.carSigns.toString()}')
+          else
+            for(var item in widget.model.carSigns ?? [])
+              Text('Car signs: ' + item.toString()),
           Row(
             children: [
-              Text('Car signs: ' + widget.model.carSigns.toString()),
+              if(widget.model.carDrivingSide?.isNotEmpty == true)
+                Text('Car driving side: ' + widget.model.carDrivingSide.toString())
+              else
+                Text('Car driving side: ' + widget.dbModel.carDrivingSide.toString()),
             ],
           ),
-          Row(
-            children: [
-              Text('Card driving side: ' +
-                  widget.model.carDrivingSide.toString()),
-            ],
-          ),
-          // for (var entry in widget.model.languages!.entries)
-          //   Text('Language (${entry.key}): ${entry.value}'),
-          // Text("Common: "+widget.model.getNativeCommonNames(widget.model)),
-          // for(var i in widget.model.getNativeCodes(widget.model))
-          //   Text(i),
-
           Column(
             children: [
-              for (var entry in widget.model.languages!.entries)
-                if (widget.model.nativeNames!.containsKey(entry.key))
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child:
-                    Text('${entry.value}: ' + widget.model.nativeNames![entry
-                        .key]['common'])
-                    ,
-                  )
-
+              if(widget.model.languages?.isNotEmpty == true)
+                for (var entry in widget.model.languages!.entries)
+                  if (widget.model.nativeNames!.containsKey(entry.key))
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child:
+                      Text('${entry.value}: ' + widget.model.nativeNames![entry
+                          .key]['common'])
+                      ,
+                    )
+              else
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child:
+                      Text("Languages: ${widget.dbModel.languages}")
+                      ,
+                    )
             ],
           ),
 
