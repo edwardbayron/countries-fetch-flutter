@@ -39,7 +39,6 @@ class DB {
   Future<CountryModel> create(CountryModel country) async {
     final db = await instance.database;
     final capital = await db.insert('countries', country.toJson());
-    Logger().e("TEST: country country.toJson(): "+country.toJson().toString());
     return country.copy(capital: capital.toString());
   }
 
@@ -56,7 +55,6 @@ class DB {
   Future<List<CountryDatabaseModel>> readAll() async {
     final db = await instance.database;
     final result = await db.query('countries');
-    Logger().e("TEST: result: "+result.toString());
     return result.map((json) => CountryDatabaseModel.fromJsonDb(json)).toList();
   }
 
@@ -64,7 +62,7 @@ class DB {
     final db = await instance.database;
     return await db.delete(
       'countries',
-      where: '${capital} = ?',
+      where: 'capital = ?',
       whereArgs: [capital],
     );
   }

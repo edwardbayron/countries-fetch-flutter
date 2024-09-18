@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'CountryDatabaseModel.dart';
+import 'DB.dart';
 import 'models/CountryDataModel.dart';
 
 void main() =>
@@ -57,42 +58,32 @@ class DialogExample extends StatefulWidget {
 }
 
 class _DialogExampleState extends State<DialogExample> {
-  bool isBookmarked = false;
+  late Future<bool> isBookmarked;
+  DB database = DB.instance;
 
   @override
   void initState() {
     super.initState();
-    loadBookmarkStatus();
-  }
-
-  void loadBookmarkStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ??
-        [];
-
-    setState(() {
-      isBookmarked = savedBookmarks.contains(jsonEncode(widget.model?.toJson()));
-    });
+    isBookmarked = checkBookmarkStatus();
   }
 
   void toggleBookmark() async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> savedBookmarks = prefs.getStringList('bookmarkedCountries') ??
-        [];
-
-    String countryJson = jsonEncode(widget.model?.toJson());
-
+    bool currentStatus = await isBookmarked;
+    if (currentStatus) {
+      await database.delete(widget.model.capital!);
+    } else {
+      await database.create(widget.model);
+    }
     setState(() {
-      if (isBookmarked) {
-        savedBookmarks.remove(countryJson);
-      } else {
-        savedBookmarks.add(countryJson);
-      }
-
-      isBookmarked = !isBookmarked;
+      isBookmarked = Future.value(!currentStatus);
     });
 
-    await prefs.setStringList('bookmarkedCountries', savedBookmarks);
+    Navigator.of(context).pop(!currentStatus);
+  }
+
+  Future<bool> checkBookmarkStatus() async {
+    List<CountryDatabaseModel> bookmarkedCountries = await database.readAll();
+    return bookmarkedCountries.any((country) => country.capital == widget.model.capital);
   }
 
   @override
@@ -170,41 +161,51 @@ class _DialogExampleState extends State<DialogExample> {
                 Text('Car driving side: ' + widget.dbModel.carDrivingSide.toString()),
             ],
           ),
-          Column(
-            children: [
-              if(widget.model.languages?.isNotEmpty == true)
-                for (var entry in widget.model.languages!.entries)
-                  if (widget.model.nativeNames!.containsKey(entry.key))
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child:
-                      Text('${entry.value}: ' + widget.model.nativeNames![entry
-                          .key]['common'])
-                      ,
-                    )
 
 
-            ],
-          ),
+          if(widget.dbModel.languages.isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var entry in jsonDecode(widget.dbModel.languages).entries)
+                  Text('${entry.value}: ${jsonDecode(widget.dbModel.nativeNames)[entry.key]['common']}'),
+              ],
+            )
+          else
+            Column(
+              children: [
+                if(widget.model.languages?.isNotEmpty == true)
+                  for (var entry in widget.model.languages!.entries)
+                    if (widget.model.nativeNames!.containsKey(entry.key))
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child:
+                        Text('${entry.value}: ' + widget.model.nativeNames![entry
+                            .key]['common'])
+                        ,
+                      )
 
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (var entry in jsonDecode(widget.dbModel.languages).entries)
-                Text('${entry.value}: ${jsonDecode(widget.dbModel.nativeNames)[entry.key]['common']}'),
-            ],
-          )
 
-
+              ],
+            ),
         ],
       ),
       actions: [
-        IconButton(
-          icon: Icon(
-            isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-            color: isBookmarked ? Colors.blue : Colors.grey,
-          ),
-          onPressed: toggleBookmark,
+        FutureBuilder<bool>(
+          future: isBookmarked,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return IconButton(
+                icon: Icon(
+                  snapshot.data! ? Icons.bookmark : Icons.bookmark_border,
+                  color: snapshot.data! ? Colors.blue : Colors.grey,
+                ),
+                onPressed: toggleBookmark,
+              );
+            } else {
+              return CircularProgressIndicator();
+            }
+          },
         ),
         TextButton(
           onPressed: () {
