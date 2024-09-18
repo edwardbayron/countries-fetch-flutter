@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'CountryDatabaseModel.dart';
 import 'models/CountryDataModel.dart';
 
 void main() =>
@@ -18,6 +19,7 @@ void main() =>
 
 class CountryDetailsScreen extends StatelessWidget {
   final CountryModel model;
+  //final CountryDatabaseModel dbModel;
 
   const CountryDetailsScreen({super.key, required this.model});
 

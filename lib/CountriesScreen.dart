@@ -3,10 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:vool_test_project/BookmarkedCountriesScreen.dart';
 import 'package:vool_test_project/CountryDetailsScreen.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as join;
+
+import 'DB.dart';
 
 class CountriesScreen extends StatefulWidget {
   const CountriesScreen({super.key});
@@ -19,12 +23,15 @@ class _CountriesScreenState extends State<CountriesScreen> {
 
   Set<String> bookmarkedCountriesJson = Set();
   late Future<List<CountryModel>> futureCountries;
+  DB database = DB.instance;
 
   @override
   void initState() {
 
     futureCountries = fetchCountriesData();
-    loadBookmarks();
+    //loadBookmarks();
+
+
   }
 
   Future<List<CountryModel>> fetchCountriesData() async {
@@ -62,6 +69,7 @@ class _CountriesScreenState extends State<CountriesScreen> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,8 +105,6 @@ class _CountriesScreenState extends State<CountriesScreen> {
                   bool isBookmarked = bookmarkedCountriesJson.contains(jsonEncode(country.toJson()));
                   return GestureDetector(
                     onTap: () {
-                      Logger().e("ON TAP: country: "+country.capital.toString());
-                      Logger().e("ON TAP: index: "+index.toString());
                       showDialog(context: context, builder: (BuildContext context){
                         return CountryDetailsScreen(model: country);
                       });
@@ -121,14 +127,17 @@ class _CountriesScreenState extends State<CountriesScreen> {
                           onTap: () {
                             setState(() {
                               String countryJson = jsonEncode(country);
-                              Logger().e("SAVED COUNTRY JSON: "+countryJson);
                               if (isBookmarked) {
-                                bookmarkedCountriesJson.remove(countryJson);
+                                //bookmarkedCountriesJson.remove(countryJson);
+                                database.delete(country.capital!);
                               } else {
-                                bookmarkedCountriesJson.add(countryJson);
+                                //bookmarkedCountriesJson.add(countryJson);
+                                Logger().e("TEST: country png: "+country.pngFlag.toString());
+                                database.create(country);
                               }
                             });
-                            saveBookmarks();
+                            //database.create(country);
+                            //saveBookmarks();
                           },
                           child: Image.asset(
                             width: 20.0,
