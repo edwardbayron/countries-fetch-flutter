@@ -1,14 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:vool_test_project/CountryDetailsScreen.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
-import 'package:path/path.dart';
 
 import 'CountryDatabaseModel.dart';
 import 'DB.dart';
@@ -32,11 +28,36 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
   void initState() {
     super.initState();
     loadBookmarksSync();
-    futureBookmarkedCountries = database.readAll();
+    futureBookmarkedCountries = DB.instance.readAll();
   }
 
   List<CountryModel> getBookmarkedCountries() {
     return bookmarkedCountriesList; // Accessing the globally stored data synchronously
+  }
+
+  void showCountryDetails(CountryDatabaseModel country) async {
+    final bool? bookmarkChanged = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return CountryDetailsScreen(
+            model: CountryModel(
+              capital: country.capital,
+              pngFlag: country.pngFlag,
+              countryName: country.countryName,
+              carSigns: country.carSigns?.split(','),
+              carDrivingSide: country.carDrivingSide,
+              languages: jsonDecode(country.languages),
+              nativeNames: jsonDecode(country.nativeNames),
+            ),
+            dbModel: country);
+      },
+    );
+
+    if (bookmarkChanged == true) {
+      setState(() {
+        futureBookmarkedCountries = database.readAll();
+      });
+    }
   }
 
   @override
@@ -54,7 +75,7 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
       ),
       body: Center(
         child: FutureBuilder<List<CountryDatabaseModel>>(
-          future: database.readAll() as Future<List<CountryDatabaseModel>>,
+          future: database.readAll(),
           builder: (context, snapshot) {
 
             ElevatedButton(
@@ -75,19 +96,7 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
                           (bookmarked) =>
                       bookmarked.capital == country.capital);
                   return GestureDetector(
-                    onTap: () {
-                      showDialog(context: context, builder: (BuildContext context){
-                        return CountryDetailsScreen(model: CountryModel(
-                            capital: '',
-                            pngFlag: '',
-                            countryName: '',
-                            carSigns: [''],
-                            carDrivingSide: '',
-                            languages: null,
-                            nativeNames: null
-                        ), dbModel: country);
-                      });
-                    },
+                    onTap: () => showCountryDetails(country),
                     child: Container(
                       padding: EdgeInsets.all(10.0),
                       margin: EdgeInsets.all(10.0),

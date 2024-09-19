@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'CountryDatabaseModel.dart';
@@ -60,17 +61,27 @@ class DialogExample extends StatefulWidget {
 class _DialogExampleState extends State<DialogExample> {
   late Future<bool> isBookmarked;
   DB database = DB.instance;
+  late CountryModel _model;
 
   @override
   void initState() {
     super.initState();
+    _model = widget.model ?? CountryModel(
+      capital: widget.dbModel.capital,
+      pngFlag: widget.dbModel.pngFlag,
+      countryName: widget.dbModel.countryName,
+      carSigns: widget.dbModel.carSigns?.split(','),
+      carDrivingSide: widget.dbModel.carDrivingSide,
+      languages: jsonDecode(widget.dbModel.languages),
+      nativeNames: jsonDecode(widget.dbModel.nativeNames),
+    );
     isBookmarked = checkBookmarkStatus();
   }
 
   void toggleBookmark() async {
     bool currentStatus = await isBookmarked;
     if (currentStatus) {
-      await database.delete(widget.model.capital!);
+      await database.delete(widget.dbModel.capital!);
     } else {
       await database.create(widget.model);
     }
@@ -194,6 +205,7 @@ class _DialogExampleState extends State<DialogExample> {
         FutureBuilder<bool>(
           future: isBookmarked,
           builder: (context, snapshot) {
+
             if (snapshot.hasData) {
               return IconButton(
                 icon: Icon(

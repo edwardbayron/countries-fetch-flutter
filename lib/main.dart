@@ -1,30 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-
 import 'package:vool_test_project/CountriesScreen.dart';
+import 'package:vool_test_project/DB.dart';
 
-import 'DB.dart';
-import 'models/CountryDataModel.dart';
-
-DB database = DB.instance;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-
   runApp(const MyApp());
-
-
 }
-
-
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -83,5 +68,11 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  @override
+  void dispose() {
+    DB.instance.close();
+    super.dispose();
   }
 }
