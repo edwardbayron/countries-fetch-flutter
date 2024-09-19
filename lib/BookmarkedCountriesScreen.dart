@@ -64,7 +64,7 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Countries Screen"),
+        title: Text("Bookmarks Screen"),
         centerTitle: true,
         backgroundColor: Colors.white,
         actions: [
