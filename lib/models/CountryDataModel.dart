@@ -51,6 +51,7 @@ import 'package:logger/logger.dart';
 
 class CountryModel {
 
+  var id;
   final String? capital;
   final String? pngFlag;
   final String? countryName;
@@ -59,20 +60,20 @@ class CountryModel {
   final Map<String, dynamic>? languages;
   final Map<String, dynamic>? nativeNames;
 
-  CountryModel({required this.capital, required this.pngFlag, required this.countryName, required this.carSigns, required this.carDrivingSide, required this.languages, required this.nativeNames});
+  CountryModel({this.id, required this.capital, required this.pngFlag, required this.countryName, required this.carSigns, required this.carDrivingSide, required this.languages, required this.nativeNames});
 
   factory CountryModel.fromJson(Map<String, dynamic> json) {
-    var languagesMap = jsonEncode(json['languages']);
     return CountryModel(
       capital: json['capital'] != null && (json['capital']).isNotEmpty ? json['capital'][0] : 'N/A',
       pngFlag: json['flags']?['png'] as String?,
       countryName: json['name']?['common'] as String?,
       carSigns: json['car']?['signs'],
       carDrivingSide: json['car']?['side'] as String?,
-      languages: json['languages'],
+      languages: convertLanguageMap(json['languages']),
       nativeNames: json['name']?['nativeName']
     );
   }
+
 
   factory CountryModel.fromJsonV2(Map<String, dynamic> json) {
     return CountryModel(
@@ -87,15 +88,14 @@ class CountryModel {
     );
   }
 
+
+
   Map<String, String?> toJson() {
-    Logger().e("languages 1: "+languages.toString());
-    Logger().e("languages 2: "+jsonEncode(languages).toString());
 
     var carSignsConverted = carSigns?.join(" ");
     var languagesMap = jsonEncode(languages);
     var nativeNamesMap = jsonEncode(nativeNames);
     var pngFlagMap = jsonEncode(pngFlag);
-    Logger().e("commonNames 2: "+jsonEncode(nativeNames).toString());
     return {
       'capital': capital,
       'pngFlag': pngFlagMap,
@@ -103,7 +103,7 @@ class CountryModel {
       'carSigns': carSignsConverted,
       'carDrivingSide': carDrivingSide,
       'languages': languagesMap,
-      'commonNames': nativeNamesMap
+      'nativeNames': nativeNamesMap
     };
   }
 
@@ -119,7 +119,6 @@ class CountryModel {
       });
     }
     for(var i in commonNames){
-      Logger().e("SPISOK: "+i);
     }
     return commonNames;  // Join them into a single string for displaying
   }
@@ -139,4 +138,62 @@ class CountryModel {
     return commonNames.join(', ');  // Join them into a single string for displaying
   }
 
+  Map<String, Object?> toMap() {
+    return {
+      'capital': capital,
+      'pngFlag': pngFlag,
+      'countryName': countryName,
+    };
+  }
+
+  // Implement toString to make it easier to see information about
+  // each dog when using the print statement.
+  @override
+  String toString() {
+    return 'Country{capital: $capital, pngFlag: $pngFlag, countryName: $countryName}';
+  }
+
+
+
+  CountryModel copy({
+    int? id,
+    String? capital,
+    String? pngFlag,
+    String? countryName,
+    List<dynamic>? carSigns,
+    String? carDrivingSide,
+    Map<String, dynamic>? languages,
+    Map<String, dynamic>? nativeNames,
+  }) =>
+      CountryModel(
+        id: id ?? this.id,
+        capital: capital ?? this.capital,
+        pngFlag: pngFlag ?? this.pngFlag,
+        countryName: countryName ?? this.countryName,
+        carSigns: carSigns ?? this.carSigns,
+        carDrivingSide: carDrivingSide ?? this.carDrivingSide,
+        languages: languages ?? this.languages,
+        nativeNames: nativeNames ?? this.nativeNames,
+      );
+
+}
+
+Map<String, dynamic> convertLanguageMap(dynamic languageData) {
+  if (languageData is Map<String, dynamic>) {
+    return languageData;
+  } else if (languageData is Map) {
+    return languageData.map((key, value) => MapEntry(key.toString(), value));
+  } else if (languageData is String) {
+    try {
+      var decoded = jsonDecode(languageData);
+      if (decoded is Map) {
+        return decoded.map((key, value) => MapEntry(key.toString(), value));
+      }
+    } catch (e) {
+      print("Error parsing language data: $e");
+    }
+  }
+
+  // If all else fails, return an empty map
+  return {};
 }
