@@ -28,8 +28,27 @@ class _CountriesScreenState extends State<CountriesScreen> {
 
   @override
   void initState() {
-    futureCountries = fetchCountriesData();
-    futureBookmarkedCountries = database.readAll();
+    super.initState();
+
+    setState(() {
+      fetchCountriesData();
+      futureCountries = fetchCountriesData();
+      futureBookmarkedCountries = database.readAll();
+
+    });
+
+  }
+
+
+  @override
+  void didChangeDependencies() {
+    setState(() {
+      fetchCountriesData();
+      futureCountries = fetchCountriesData();
+      futureBookmarkedCountries = database.readAll();
+
+    });
+    super.didChangeDependencies();
   }
 
   Future<List<CountryModel>> fetchCountriesData() async {
@@ -45,10 +64,10 @@ class _CountriesScreenState extends State<CountriesScreen> {
   }
 
   void showCountryDetails(CountryModel country) async {
-    final bool? bookmarkChanged = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return CountryDetailsScreen(
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CountryDetailsScreen(
             model: country,
             dbModel: CountryDatabaseModel(
                 capital: '',
@@ -57,13 +76,21 @@ class _CountriesScreenState extends State<CountriesScreen> {
                 carSigns: '',
                 carDrivingSide: '',
                 languages: '',
-                nativeNames: ''));
-      },
-    );
+                nativeNames: '')),
+      ),
+    ).then((_) {
+      setState(() {
+        fetchCountriesData();
+        futureCountries = fetchCountriesData();
+        futureBookmarkedCountries = database.readAll();
+      });
+    });
 
-    if (bookmarkChanged == true) {
+
+    if (result != null && result['bookmarkChanged'] == true) {
       setState(() {
         futureBookmarkedCountries = database.readAll();
+        fetchCountriesData();
       });
     }
   }

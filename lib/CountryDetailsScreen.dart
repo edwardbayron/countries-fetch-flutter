@@ -28,52 +28,33 @@ void main() =>
               nativeNames: ''),
         ));
 
-class CountryDetailsScreen extends StatelessWidget {
+class CountryDetailsScreen extends StatefulWidget {
   final CountryModel model;
   final CountryDatabaseModel dbModel;
 
   CountryDetailsScreen({super.key, required this.model, required this.dbModel});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Country details')),
-        body: Center(
-          child: DialogExample(model: model, dbModel: dbModel),
-        ),
-      ),
-    );
-  }
+  State<CountryDetailsScreen> createState() => _CountryDetailsScreenState();
 }
 
-class DialogExample extends StatefulWidget {
-  final CountryModel model;
-  final CountryDatabaseModel dbModel;
-
-  DialogExample({super.key, required this.model, required this.dbModel});
-
-
-  @override
-  State<DialogExample> createState() => _DialogExampleState();
-}
-
-class _DialogExampleState extends State<DialogExample> {
+class _CountryDetailsScreenState extends State<CountryDetailsScreen>{
   late Future<bool> isBookmarked;
   DB database = DB.instance;
   late CountryModel _model;
+
 
   @override
   void initState() {
     super.initState();
     _model = widget.model ?? CountryModel(
-      capital: widget.dbModel.capital,
-      pngFlag: widget.dbModel.pngFlag,
-      countryName: widget.dbModel.countryName,
-      carSigns: widget.dbModel.carSigns?.split(','),
-      carDrivingSide: widget.dbModel.carDrivingSide,
-      languages: jsonDecode(widget.dbModel.languages),
-      nativeNames: jsonDecode(widget.dbModel.nativeNames),
+      capital: widget.dbModel!.capital,
+      pngFlag: widget.dbModel!.pngFlag,
+      countryName: widget.dbModel!.countryName,
+      carSigns: widget.dbModel!.carSigns?.split(','),
+      carDrivingSide: widget.dbModel!.carDrivingSide,
+      languages: jsonDecode(widget.dbModel!.languages),
+      nativeNames: jsonDecode(widget.dbModel!.nativeNames),
     );
     isBookmarked = checkBookmarkStatus();
   }
@@ -81,26 +62,58 @@ class _DialogExampleState extends State<DialogExample> {
   void toggleBookmark() async {
     bool currentStatus = await isBookmarked;
     if (currentStatus) {
-      await database.delete(widget.dbModel.capital!);
+      await database.delete(_model.capital!);
     } else {
-      await database.create(widget.model);
+      await database.create(_model);
     }
     setState(() {
       isBookmarked = Future.value(!currentStatus);
     });
 
-    Navigator.of(context).pop(!currentStatus);
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop({'bookmarkChanged': true});
+    }
   }
 
   Future<bool> checkBookmarkStatus() async {
     List<CountryDatabaseModel> bookmarkedCountries = await database.readAll();
-    return bookmarkedCountries.any((country) => country.capital == widget.model.capital);
+    return bookmarkedCountries.any((country) => country.capital == _model.capital);
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Column(
+    return MaterialApp(
+        home: Scaffold(
+      appBar: AppBar(
+        title: Text("Dialog"),
+          actions: [
+            FutureBuilder<bool>(
+              future: isBookmarked,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return IconButton(
+                    icon: Icon(
+                      snapshot.data! ? Icons.bookmark : Icons.bookmark_border,
+                      color: snapshot.data! ? Colors.blue : Colors.grey,
+                    ),
+                    onPressed: toggleBookmark,
+                  );
+                } else {
+                  return CircularProgressIndicator();
+                }
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(isBookmarked); // Close the dialog
+              },
+              child: const Text('Close'),
+            ),
+          ],
+
+
+      ),
+      body: Column(
         children: [
           Column(
             children: [
@@ -201,31 +214,8 @@ class _DialogExampleState extends State<DialogExample> {
             ),
         ],
       ),
-      actions: [
-        FutureBuilder<bool>(
-          future: isBookmarked,
-          builder: (context, snapshot) {
 
-            if (snapshot.hasData) {
-              return IconButton(
-                icon: Icon(
-                  snapshot.data! ? Icons.bookmark : Icons.bookmark_border,
-                  color: snapshot.data! ? Colors.blue : Colors.grey,
-                ),
-                onPressed: toggleBookmark,
-              );
-            } else {
-              return CircularProgressIndicator();
-            }
-          },
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context); // Close the dialog
-          },
-          child: const Text('Close'),
-        ),
-      ],
+    ),
     );
   }
 }

@@ -27,7 +27,6 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
   @override
   void initState() {
     super.initState();
-    loadBookmarksSync();
     futureBookmarkedCountries = DB.instance.readAll();
   }
 
@@ -36,10 +35,10 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
   }
 
   void showCountryDetails(CountryDatabaseModel country) async {
-    final bool? bookmarkChanged = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return CountryDetailsScreen(
+    final  result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CountryDetailsScreen(
             model: CountryModel(
               capital: country.capital,
               pngFlag: country.pngFlag,
@@ -49,11 +48,27 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
               languages: jsonDecode(country.languages),
               nativeNames: jsonDecode(country.nativeNames),
             ),
-            dbModel: country);
-      },
+            dbModel: country),
+      ),
     );
+    // final bool? bookmarkChanged = await showDialog<bool>(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return CountryDetailsScreen(
+    //         model: CountryModel(
+    //           capital: country.capital,
+    //           pngFlag: country.pngFlag,
+    //           countryName: country.countryName,
+    //           carSigns: country.carSigns?.split(','),
+    //           carDrivingSide: country.carDrivingSide,
+    //           languages: jsonDecode(country.languages),
+    //           nativeNames: jsonDecode(country.nativeNames),
+    //         ),
+    //         dbModel: country);
+    //   },
+    // );
 
-    if (bookmarkChanged == true) {
+    if (result != null && result['bookmarkChanged'] == true) {
       setState(() {
         futureBookmarkedCountries = database.readAll();
       });
@@ -129,31 +144,3 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
   }
 }
 
-
-
-void loadBookmarksSync() {
-  SharedPreferences.getInstance().then((prefs) {
-    List<String>? savedBookmarks = prefs.getStringList('bookmarkedCountries');
-    if (savedBookmarks != null) {
-      bookmarkedCountriesList = savedBookmarks.map((countryJson) {
-        Map<String, dynamic> data = jsonDecode(countryJson);
-
-        if (data['languages'] is String) {
-          data['languages'] = jsonDecode(data['languages']);
-        }
-
-        if (data['pngFlag'] is String) {
-          data['pngFlag'] = "https://flagcdn.com/w320/gs.png";
-        }
-
-        if (data['commonNames'] is String) {
-          data['name'] = {'nativeName': jsonDecode(data['commonNames'])};
-          data.remove('commonNames');
-        }
-
-        return CountryModel.fromJsonV2(data);
-      }).toList();
-
-    }
-  });
-}
