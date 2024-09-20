@@ -39,18 +39,6 @@ class _CountriesScreenState extends State<CountriesScreen> {
 
   }
 
-
-  @override
-  void didChangeDependencies() {
-    setState(() {
-      fetchCountriesData();
-      futureCountries = fetchCountriesData();
-      futureBookmarkedCountries = database.readAll();
-
-    });
-    super.didChangeDependencies();
-  }
-
   Future<List<CountryModel>> fetchCountriesData() async {
     final response = await http.get(Uri.parse(
         'https://restcountries.com/v3.1/all?fields=name,flag,flags,capital,car,languages'));
@@ -78,13 +66,7 @@ class _CountriesScreenState extends State<CountriesScreen> {
                 languages: '',
                 nativeNames: '')),
       ),
-    ).then((_) {
-      setState(() {
-        fetchCountriesData();
-        futureCountries = fetchCountriesData();
-        futureBookmarkedCountries = database.readAll();
-      });
-    });
+    );
 
 
     if (result != null && result['bookmarkChanged'] == true) {
