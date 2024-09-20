@@ -1,16 +1,22 @@
 # vool_test_project
 
-A new Flutter project.
+Flutter project, which shows a countries list based on API provided from foreign website.
 
-## Getting Started
+## Tools used
 
-This project is a starting point for a Flutter application.
+- Flutter SDK
+- SQFLite library for local database maintaining
+- SharedPreferences (removed usage for saving and presenting data)
+- HTTP library
+- Basic Material/Cupertino libraries to show data on UI
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Link to API:
+https://restcountries.com/v3.1/all?fields=name,flag,flags,capital,car,languages
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Example video
+
+
+
+https://github.com/user-attachments/assets/e05beced-8361-435d-9bd9-7652487858c9
+
