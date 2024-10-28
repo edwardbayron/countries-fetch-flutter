@@ -1,52 +1,4 @@
-// class CountryDataModel {
-//   final String pngFlag;
-//   final String svgFlag;
-//   final String altFlagText;
-//   final String common;
-//   final String officialName;
-//   final String? nativeCommonName;
-//   final String? nativeOfficialName;
-//   final List<dynamic> capital;
-//   final String language;
-//   final String flagEmoji;
-//   final String carSign;
-//   final String driveSide;
-//
-//   const CountryDataModel({
-//     required this.pngFlag,
-//     required this.svgFlag,
-//     required this.altFlagText,
-//     required this.common,
-//     required this.officialName,
-//     required this.nativeCommonName,
-//     required this.nativeOfficialName,
-//     required this.capital,
-//     required this.language,
-//     required this.flagEmoji,
-//     required this.carSign,
-//     required this.driveSide,
-//   });
-//
-//   factory CountryDataModel.fromJson(dynamic json) {
-//     return CountryDataModel(
-//       pngFlag: json['flags']['png'] as String,
-//       svgFlag: json['flags']['svg'] as String,
-//       altFlagText: json['flags']['alt'] as String? ?? '',
-//       common: json['name']?['common'] as String ?? '',
-//       officialName: json['name']['official'] as String,
-//       nativeCommonName: json['name']['nativeName']['eng']?['common'],
-//       nativeOfficialName: json['name']?['nativeName']?['eng']?['official'] ?? 'test',
-//       capital: (json['capital']),
-//       language: json['languages']['eng'] ?? 'testLanguage',
-//       flagEmoji: json['flag'] ?? 'testFlagEmoji',
-//       carSign: json['car']['signs'][0] ?? 'testCarSign',
-//       driveSide: json['car']['side'] ?? 'testDriveSide',
-//     );
-//   }
-// }
-
 import 'dart:convert';
-
 import 'package:logger/logger.dart';
 
 class CountryModel {
@@ -74,7 +26,6 @@ class CountryModel {
     );
   }
 
-
   factory CountryModel.fromJsonV2(Map<String, dynamic> json) {
     return CountryModel(
         capital: json['capital'] ?? 'Unknown Capital',
@@ -87,8 +38,6 @@ class CountryModel {
 
     );
   }
-
-
 
   Map<String, String?> toJson() {
 
@@ -112,7 +61,6 @@ class CountryModel {
 
     if (country.languages != null && country.nativeNames != null) {
       country.languages!.forEach((key, value) {
-        // If nativeNames contains the key from languages, extract its 'common' value
         if (country.nativeNames!.containsKey(key)) {
           commonNames.add(key);
         }
@@ -120,7 +68,7 @@ class CountryModel {
     }
     for(var i in commonNames){
     }
-    return commonNames;  // Join them into a single string for displaying
+    return commonNames;
   }
 
   String getNativeCommonNames(CountryModel country) {
@@ -128,14 +76,13 @@ class CountryModel {
 
     if (country.languages != null && country.nativeNames != null) {
       country.languages!.forEach((key, value) {
-        // If nativeNames contains the key from languages, extract its 'common' value
         if (country.nativeNames!.containsKey(key)) {
           commonNames.add(country.nativeNames![key]['common']);
         }
       });
     }
 
-    return commonNames.join(', ');  // Join them into a single string for displaying
+    return commonNames.join(', ');
   }
 
   Map<String, Object?> toMap() {
@@ -146,14 +93,10 @@ class CountryModel {
     };
   }
 
-  // Implement toString to make it easier to see information about
-  // each dog when using the print statement.
   @override
   String toString() {
     return 'Country{capital: $capital, pngFlag: $pngFlag, countryName: $countryName}';
   }
-
-
 
   CountryModel copy({
     int? id,
@@ -175,7 +118,6 @@ class CountryModel {
         languages: languages ?? this.languages,
         nativeNames: nativeNames ?? this.nativeNames,
       );
-
 }
 
 Map<String, dynamic> convertLanguageMap(dynamic languageData) {
@@ -194,6 +136,5 @@ Map<String, dynamic> convertLanguageMap(dynamic languageData) {
     }
   }
 
-  // If all else fails, return an empty map
   return {};
 }

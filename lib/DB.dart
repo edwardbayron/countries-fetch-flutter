@@ -1,7 +1,6 @@
 import 'package:logger/logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
-
 import 'CountryDatabaseModel.dart';
 
 class DB {

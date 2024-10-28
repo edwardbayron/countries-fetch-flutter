@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vool_test_project/CountryDetailsScreen.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
-
 import 'CountryDatabaseModel.dart';
 import 'DB.dart';
 
@@ -51,22 +49,6 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
             dbModel: country),
       ),
     );
-    // final bool? bookmarkChanged = await showDialog<bool>(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return CountryDetailsScreen(
-    //         model: CountryModel(
-    //           capital: country.capital,
-    //           pngFlag: country.pngFlag,
-    //           countryName: country.countryName,
-    //           carSigns: country.carSigns?.split(','),
-    //           carDrivingSide: country.carDrivingSide,
-    //           languages: jsonDecode(country.languages),
-    //           nativeNames: jsonDecode(country.nativeNames),
-    //         ),
-    //         dbModel: country);
-    //   },
-    // );
 
     if (result != null && result['bookmarkChanged'] == true) {
       setState(() {

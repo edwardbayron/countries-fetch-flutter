@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 
 class Request {
@@ -13,17 +12,10 @@ class Request {
       headers: {'Content-Type': 'application/json' },
     );
 
-    // if (response.statusCode == 200) {
-    //
-    //   return responseData;
-    // } else {
-    //   return null;
-    // }
     return json.decode(response.body);
   }
 
   static String GetApiUrl() {
-    //return FlutterConfig.get('apiUrl');
     return "";
   }
 }
