@@ -190,34 +190,37 @@ class _CountryDetailsScreenState extends State<CountryDetailsScreen> {
                 ],
               ),
             ),
-            if (widget.dbModel.languages.isNotEmpty)
-              Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var entry
-                          in jsonDecode(widget.dbModel.languages).entries)
-                        Text(
-                            '${entry.value}: ${jsonDecode(widget.dbModel.nativeNames)[entry.key]['common']}'),
-                    ],
-                  ))
-            else
-              Padding(
+            Padding(
                 padding: const EdgeInsets.only(left: 10.0),
-                child: Column(
+                child: Row(
                   children: [
-                    if (widget.model.languages?.isNotEmpty == true)
-                      for (var entry in widget.model.languages!.entries)
-                        if (widget.model.nativeNames!.containsKey(entry.key))
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text('${entry.value}: ' +
-                                widget.model.nativeNames![entry.key]['common']),
-                          )
+                    if (widget.dbModel.languages.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          for (var entry
+                              in jsonDecode(widget.dbModel.languages).entries)
+                            Text(
+                                '${entry.value}: ${jsonDecode(widget.dbModel.nativeNames)[entry.key]['common']}'),
+                        ],
+                      )
+                    else
+                      Column(
+                        children: [
+                          if (widget.model.languages?.isNotEmpty == true)
+                            for (var entry in widget.model.languages!.entries)
+                              if (widget.model.nativeNames!
+                                  .containsKey(entry.key))
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text('${entry.value}: ' +
+                                      widget.model.nativeNames![entry.key]
+                                          ['common']),
+                                )
+                        ],
+                      ),
                   ],
-                ),
-              )
+                ))
           ],
         ),
       ),

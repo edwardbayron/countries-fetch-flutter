@@ -85,7 +85,7 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
         child:
     Scaffold(
       appBar: AppBar(
-        title: Text("Bookmarks Screen"),
+        title: Text("Bookmarks"),
         centerTitle: true,
         backgroundColor: Colors.white,
         actions: [
@@ -104,7 +104,7 @@ class _CountriesScreenState extends State<BookmarkedCountriesScreen> {
               style: ElevatedButton.styleFrom(
                   elevation: 12.0,
                   textStyle: const TextStyle(color: Colors.yellow)),
-              child: const Text('Bookmarked Countries'),
+              child: const Text('Bookmarks'),
             );
             if (snapshot.hasData) {
               List<CountryDatabaseModel> countries = snapshot.data!;
