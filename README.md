@@ -1,4 +1,4 @@
-# vool_test_project
+# Countries Fetch Application on Flutter
 
 Flutter project, which shows a countries list based on API provided from foreign website.
 
