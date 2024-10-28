@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'CountryDatabaseModel.dart';
 import 'DB.dart';
@@ -32,7 +30,7 @@ class CountryDetailsScreen extends StatefulWidget {
   final CountryModel model;
   final CountryDatabaseModel dbModel;
 
-  CountryDetailsScreen({super.key, required this.model, required this.dbModel});
+  const CountryDetailsScreen({super.key, required this.model, required this.dbModel});
 
   @override
   State<CountryDetailsScreen> createState() => _CountryDetailsScreenState();
@@ -47,15 +45,7 @@ class _CountryDetailsScreenState extends State<CountryDetailsScreen>{
   @override
   void initState() {
     super.initState();
-    _model = widget.model ?? CountryModel(
-      capital: widget.dbModel!.capital,
-      pngFlag: widget.dbModel!.pngFlag,
-      countryName: widget.dbModel!.countryName,
-      carSigns: widget.dbModel!.carSigns?.split(','),
-      carDrivingSide: widget.dbModel!.carDrivingSide,
-      languages: jsonDecode(widget.dbModel!.languages),
-      nativeNames: jsonDecode(widget.dbModel!.nativeNames),
-    );
+    _model = widget.model;
     isBookmarked = checkBookmarkStatus();
   }
 

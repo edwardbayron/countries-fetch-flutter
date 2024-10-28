@@ -1,15 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:vool_test_project/BookmarkedCountriesScreen.dart';
 import 'package:vool_test_project/CountryDatabaseModel.dart';
 import 'package:vool_test_project/CountryDetailsScreen.dart';
 import 'package:vool_test_project/models/CountryDataModel.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as join;
 
 import 'DB.dart';
 
@@ -34,9 +30,14 @@ class _CountriesScreenState extends State<CountriesScreen> {
       fetchCountriesData();
       futureCountries = fetchCountriesData();
       futureBookmarkedCountries = database.readAll();
-
     });
+  }
 
+  void _refreshData() {
+    setState(() {
+      futureCountries = fetchCountriesData();
+      futureBookmarkedCountries = database.readAll();
+    });
   }
 
   Future<List<CountryModel>> fetchCountriesData() async {
@@ -70,19 +71,24 @@ class _CountriesScreenState extends State<CountriesScreen> {
 
 
     if (result != null && result['bookmarkChanged'] == true) {
-      setState(() {
-        futureBookmarkedCountries = database.readAll();
-        fetchCountriesData();
-      });
+      _refreshData();
     }
   }
 
-  void openBookmarks() {
-    Navigator.push(
+  void openBookmarks() async {
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //       builder: (context) => const BookmarkedCountriesScreen()),
+    // );
+    final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => const BookmarkedCountriesScreen()),
+      MaterialPageRoute(builder: (context) => const BookmarkedCountriesScreen()),
     );
+
+    if(result != null && result['bookmarkChanged'] == true){
+      _refreshData();
+    }
   }
 
   @override
@@ -93,9 +99,9 @@ class _CountriesScreenState extends State<CountriesScreen> {
           centerTitle: true,
           backgroundColor: Colors.white,
           actions: [
-            IconButton(onPressed: () => {}, icon: Icon(Icons.search)),
+            IconButton(onPressed: () => {}, icon: const Icon(Icons.search)),
             IconButton(
-                onPressed: () => {openBookmarks()}, icon: Icon(Icons.bookmark)),
+                onPressed: () => {openBookmarks()}, icon: const Icon(Icons.bookmark)),
           ],
         ),
         body: Center(
